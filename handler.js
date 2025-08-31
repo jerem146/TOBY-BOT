@@ -37,24 +37,17 @@ export async function handler(chatUpdate) {
         if (m.isCommand) {
             const userSpam = global.spamDB[m.sender] = global.spamDB[m.sender] || { count: 0, lastTimestamp: 0 };
             const now = Date.now();
-            if (now - userSpam.lastTimestamp < 2000) {
+            if (now - userSpam.lastTimestamp < 2000) { 
                 userSpam.count++;
                 if (userSpam.count > 3) {
                     console.log(`[Anti-Spam] Usuario ${m.sender} bloqueado temporalmente por spam.`);
-                    return;
+                    return; 
                 }
             } else {
                 userSpam.count = 1;
             }
             userSpam.lastTimestamp = now;
         }
-        
-        if (m.message && !m.isBaileys) {
-            await this.readMessages([m.key]);
-            await this.sendPresenceUpdate('composing', m.chat);
-            await delay(Math.floor(Math.random() * 500) + 250);
-        }
-
 
         const chatDB = global.db.data.chats[m.chat];
         if (chatDB && chatDB.botPrimario) {
@@ -335,6 +328,10 @@ export async function handler(chatUpdate) {
                     match, usedPrefix, noPrefix, _args, args, command, text, conn: this, participants, groupMetadata, user, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename
                 }
                 try {
+                    await this.readMessages([m.key]);
+                    await this.sendPresenceUpdate('composing', m.chat);
+                    await delay(Math.floor(Math.random() * 500) + 500);
+                    
                     await plugin.call(this, m, extra)
                     if (!isPrems) m.coin = m.coin || plugin.coin || false
                 } catch (e) {
@@ -347,6 +344,8 @@ export async function handler(chatUpdate) {
                         m.reply(text)
                     }
                 } finally {
+                    await this.sendPresenceUpdate('paused', m.chat);
+                    
                     if (typeof plugin.after === 'function') {
                         try {
                             await plugin.after.call(this, m, extra)
