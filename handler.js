@@ -15,6 +15,8 @@ const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function (
     resolve()
 }, ms))
 
+global.spamDB = global.spamDB || {};
+
 export async function handler(chatUpdate) {
     this.msgqueque = this.msgqueque || []
     this.uptime = this.uptime || Date.now()
@@ -31,6 +33,28 @@ export async function handler(chatUpdate) {
         m = smsg(this, m) || m
         if (!m)
             return
+
+        if (m.isCommand) {
+            const userSpam = global.spamDB[m.sender] = global.spamDB[m.sender] || { count: 0, lastTimestamp: 0 };
+            const now = Date.now();
+            if (now - userSpam.lastTimestamp < 2000) {
+                userSpam.count++;
+                if (userSpam.count > 3) {
+                    console.log(`[Anti-Spam] Usuario ${m.sender} bloqueado temporalmente por spam.`);
+                    return;
+                }
+            } else {
+                userSpam.count = 1;
+            }
+            userSpam.lastTimestamp = now;
+        }
+        
+        if (m.message && !m.isBaileys) {
+            await this.readMessages([m.key]);
+            await this.sendPresenceUpdate('composing', m.chat);
+            await delay(Math.floor(Math.random() * 500) + 250);
+        }
+
 
         const chatDB = global.db.data.chats[m.chat];
         if (chatDB && chatDB.botPrimario) {
@@ -162,13 +186,13 @@ export async function handler(chatUpdate) {
         const isRAdmin = user?.admin === 'superadmin' || false
         const isAdmin = isRAdmin || user?.admin === 'admin' || false
         const isBotAdmin = !!bot?.admin
-        
+
         const myJid = this.user?.id ? conn.decodeJid(this.user.id) : '';
         const isROwner = [myJid, ...global.owner.map(([number]) => number)]
             .filter(Boolean)
             .map(v => v.replace(/[^0-9]/g, ''))
             .includes(senderNum);
-            
+
         const isOwner = isROwner || m.fromMe
         const isMods = isOwner || global.mods.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum)
         const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum) || _user.premium == true
@@ -246,13 +270,6 @@ export async function handler(chatUpdate) {
                         return
                     }
                     if (user.antispam2 && isROwner) return
-
-                    /*
-                    let time = global.db.data.users[m.sender].spam + 3000
-                    if (new Date - global.db.data.users[m.sender].spam < 3000) return console.log(`[ SPAM ]`) 
-                    global.db.data.users[m.sender].spam = new Date * 1
-                    */
-
 
                     if (m.chat in global.db.data.chats || m.sender in global.db.data.users) {
                         let chat = global.db.data.chats[m.chat]
