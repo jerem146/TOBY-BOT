@@ -6,7 +6,7 @@ const youtubeRegexID = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([a-z
 const handler = async (m, { conn, text, command }) => {
   try {
     if (!text.trim()) {
-      return conn.reply(m.chat, `✧ Debes escribir *el nombre o link* del video/audio para descargar.`, m)
+      return conn.reply(m.chat, `✧ 𝙃𝙚𝙮! Debes escribir *el nombre o link* del video/audio para descargar.`, m)
     }
 
     await conn.sendMessage(m.chat, { react: { text: "⏳", key: m.key }})
@@ -29,30 +29,38 @@ const handler = async (m, { conn, text, command }) => {
     const vistas = formatViews(views)
     const canal = author?.name || "Desconocido"
 
-    const api = await (await fetch(`http://node2.deluxehost.cl:4011/api/download/youtube?url=${encodeURIComponent(url)}`)).json()
-    if (!api?.status) throw new Error("La API no devolvió datos")
+    const apiRes = await (await fetch(`http://node2.deluxehost.cl:4011/api/download/youtube?url=${encodeURIComponent(url)}`)).json()
+    if (!apiRes?.status) throw new Error("La API no devolvió resultados")
 
-    const audioData = api.downloads.find(d => d.label === "audio")
-    const videoData = api.downloads.find(d => d.label === "normal")
-    const thumb = api.metadata?.thumbnail || thumbnail
+    const downloads = apiRes.downloads || []
+    const audioData = downloads.find(d => d.label === "audio")
+    const videoData = downloads.find(d => d.label === "normal") // 360p
+    const thumbUrl = apiRes.metadata?.thumbnail || thumbnail
 
+    // --- Mensaje con info ---
     const infoMessage = `
-> 🧊 *Título* » ${title}
-> 🧊 *Canal* » ${canal}
-> 🧊 *Duración* » ${timestamp}
-> 🧊 *Vistas* » ${vistas}
-> 🧊 *Publicado* » ${ago}
-> 🧊 *Link* » ${url}
+ㅤ۫ ㅤ  🦭 ୧   ˚ \`𝒅𝒆𝒔𝒄𝒂𝒓𝒈𝒂 𝒆𝒏 𝒄𝒂𝒎𝒊𝒏𝒐\` !  ୨ 𖹭  ִֶָ  
+
+᮫ؙܹ  ᳘︵᮫ּܹ࡛〫ࣥܳ⌒ؙ۫ ᮫ּ۪֯⏝ֺ࣯࠭۟ ᮫ּ〪࣭︶᮫ܹ᳟〫࠭߳፝֟᷼⏜᮫᮫ּ〪࣭࠭〬︵᮫ּ᳝̼࣪ 🍚⃘ᩚּ̟߲ ּ〪࣪︵᮫࣭࣪࠭ᰯּ〪࣪࠭⏜ְ࣮〫߳ ᮫ּׅ࣪۟︶᮫ܹׅ࠭〬 ᮫ּּ࣭᷼⏝ᩥ᮫〪ܹ۟࠭۟۟ ᮫ּؙ⌒᮫ܹ۫︵ᩝּּ۟࠭ ࣭۪۟
+> 🧊✿⃘࣪◌ ֪ \`𝗧𝗶́𝘁𝘂𝗹𝗼\` » *${title}*  
+> 🧊✿⃘࣪◌ ֪ \`𝗖𝗮𝗻𝗮𝗹\` » *${canal}*  
+> 🧊✿⃘࣪◌ ֪ \`𝗗𝘂𝗿𝗮𝗰𝗶𝗼́𝗻\` » *${timestamp}*  
+> 🧊✿⃘࣪◌ ֪ \`𝗩𝗶𝘀𝘁𝗮𝘀\` » *${vistas}*  
+> 🧊✿⃘࣪◌ ֪ \`𝗣𝘂𝗯𝗹𝗶𝗰𝗮𝗱𝗼\` » *${ago}*  
+> 🧊✿⃘࣪◌ ֪ \`𝗟𝗶𝗻𝗸\` » ${url} 
+ᓭ݄︢݃ୄᰰ𐨎 𝐢︩۪𝆬͡ꗜ፝֟͜͡ꗜ︪۪𝆬͡ 𝐢   ᅟᨳᩘ🧁ଓ   ᅟ 𝐢︩۪𝆬͡ꗜ፝֟͜͡ꗜ︪۪𝆬͡ 𝐢ୄᰰ𐨎ᓯ︢
+
+> 𐙚 🪵 ｡ Preparando tu descarga... ˙𐙚
     `.trim()
 
-    const thumbBuffer = (await conn.getFile(thumb))?.data
+    const thumb = (await conn.getFile(thumbUrl))?.data
     await conn.reply(m.chat, infoMessage, m, {
       contextInfo: {
         externalAdReply: {
-          title: title,
-          body: canal,
+          title: botname,
+          body: dev,
           mediaType: 1,
-          thumbnail: thumbBuffer,
+          thumbnail: thumb,
           renderLargerThumbnail: true,
           mediaUrl: url,
           sourceUrl: url
@@ -61,15 +69,11 @@ const handler = async (m, { conn, text, command }) => {
     })
 
     if (["play", "yta", "ytmp3", "playaudio"].includes(command)) {
-      if (!audioData) {
-        await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key }})
-        return conn.reply(m.chat, "✦ No encontré el audio en la API.", m)
-      }
-
+      if (!audioData) throw new Error("No encontré el audio en la API")
       await conn.sendMessage(m.chat, {
         audio: { url: audioData.url },
         fileName: `${title}.m4a`,
-        mimetype: "audio/mp4",
+        mimetype: "audio/mpeg",
         ptt: true
       }, { quoted: m })
 
@@ -77,11 +81,7 @@ const handler = async (m, { conn, text, command }) => {
     }
 
     else if (["play2", "ytv", "ytmp4", "mp4"].includes(command)) {
-      if (!videoData) {
-        await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key }})
-        return conn.reply(m.chat, "✦ No encontré el video 360p en la API.", m)
-      }
-
+      if (!videoData) throw new Error("No encontré el video 360p en la API")
       await conn.sendFile(m.chat, videoData.url, `${title}.mp4`, `✧ 𝗧𝗶́𝘁𝘂𝗹𝗼 » ${title}`, m)
       await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key }})
     }
@@ -98,10 +98,10 @@ const handler = async (m, { conn, text, command }) => {
 
 handler.command = handler.help = ["play", "yta", "ytmp3", "play2", "ytv", "ytmp4", "playaudio", "mp4"]
 handler.tags = ["descargas"]
+handler.group = true
 
 export default handler
 
-// Helper para vistas
 function formatViews(views) {
   if (!views) return "No disponible"
   if (views >= 1_000_000_000) return `${(views / 1_000_000_000).toFixed(1)}B`
