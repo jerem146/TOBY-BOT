@@ -102,7 +102,7 @@ const handler = async (m, { conn, text, command }) => {
       await conn.sendMessage(m.chat, {
         video: Buffer.from(buffer),
         fileName: `${videoData.title || "video"}.mp4`,
-        caption: `✧ 𝗧𝗶́𝘁𝘂𝗹𝗼 » ${title}`,
+        caption: `${title}`,
         mimetype: "video/mp4"
       }, { quoted: m })
 
