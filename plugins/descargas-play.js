@@ -70,7 +70,7 @@ const handler = async (m, { conn, text, command }) => {
 
       if (!audioData) {
         await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key }})
-        return conn.reply(m.chat, "✦ No se pudo descargar el audio. Intenta más tarde.", m)
+        return conn.reply(m.chat, "✦ Ninguna API respondió para el audio. Intenta más tarde.", m)
       }
 
       await conn.sendMessage(m.chat, {
@@ -97,8 +97,10 @@ const handler = async (m, { conn, text, command }) => {
         return conn.reply(m.chat, "✦ No se pudo descargar el video. Intenta más tarde.", m)
       }
 
+      let response = await fetch(videoData.link)
+      let buffer = await response.arrayBuffer()
       await conn.sendMessage(m.chat, {
-        video: { url: videoData.link },
+        video: Buffer.from(buffer),
         fileName: `${videoData.title || "video"}.mp4`,
         caption: `✧ 𝗧𝗶́𝘁𝘂𝗹𝗼 » ${title}`,
         mimetype: "video/mp4"
