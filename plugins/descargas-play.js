@@ -60,29 +60,17 @@ const handler = async (m, { conn, text, command }) => {
     })
 
     if (["play", "yta", "ytmp3", "playaudio"].includes(command)) {
-      const audioApis = [
-        async () => {
-          const r = await (await fetch(`https://api.vreden.my.id/api/ytmp3?url=${url}`)).json()
-          return r?.result?.download?.url ? { link: r.result.download.url, title: r.result.metadata?.title } : null
-        },
-        async () => {
-          const r = await (await fetch(`https://dark-core-api.vercel.app/api/download/YTMP3?key=api&url=${url}`)).json()
-          return r?.status && r?.download ? { link: r.download, title: r.title } : null
-        },
-        async () => {
-          const r = await (await fetch(`https://api.stellarwa.xyz/dow/ytmp3?url=${url}&apikey=stellar-bFA8UWSA`)).json()
-          return r?.status && r?.data?.dl ? { link: r.data.dl, title: r.data.title } : null
-        }
-      ]
-
       let audioData = null
-      for (const api of audioApis) {
-        try { audioData = await api(); if (audioData) break } catch { }
-      }
+      try {
+        const r = await (await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp3?url=${encodeURIComponent(url)}`)).json()
+        if (r?.status && r?.download?.url) {
+          audioData = { link: r.download.url, title: r.metadata?.title }
+        }
+      } catch {}
 
       if (!audioData) {
         await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key }})
-        return conn.reply(m.chat, "✦ Ninguna API respondió para el audio. Intenta más tarde.", m)
+        return conn.reply(m.chat, "✦ No se pudo descargar el audio. Intenta más tarde.", m)
       }
 
       await conn.sendMessage(m.chat, {
@@ -96,37 +84,17 @@ const handler = async (m, { conn, text, command }) => {
     }
 
     else if (["play2", "ytv", "ytmp4", "mp4"].includes(command)) {
-      const videoApis = [
-        async () => {
-          const r = await (await fetch(`https://api.sylphy.xyz/download/ytmp4?url=${encodeURIComponent(url)}&apikey=sylph-30fc019324`)).json()
-          return r?.status && r?.res?.url ? { link: r.res.url, title: r.res.title } : null
-        },
-        async () => {
-          const r = await (await fetch(`https://gokublack.xyz/download/ytmp4?url=${encodeURIComponent(url)}`)).json()
-          return r?.status && r?.data?.downloadURL ? { link: r.data.downloadURL, title: r.data.title } : null
-        },
-        async () => {
-          const r = await (await fetch(`https://api.stellarwa.xyz/dow/ytmp4?url=${url}&apikey=stellar-bFA8UWSA`)).json()
-          return r?.status && r?.data?.dl ? { link: r.data.dl, title: r.data.title } : null
-        },
-        async () => {
-          const r = await (await fetch(`https://dark-core-api.vercel.app/api/download/ytmp4/v2?key=api&url=${url}`)).json()
-          return r?.download ? { link: r.download, title: r.title } : null
-        },
-        async () => {
-          const r = await (await fetch(`https://api.vreden.my.id/api/ytmp4?url=${url}`)).json()
-          return r?.result?.download?.url ? { link: r.result.download.url, title: r.result.metadata?.title } : null
-        }
-      ]
-
       let videoData = null
-      for (const api of videoApis) {
-        try { videoData = await api(); if (videoData) break } catch { }
-      }
+      try {
+        const r = await (await fetch(`https://ruby-core.vercel.app/api/download/youtube/mp4?url=${encodeURIComponent(url)}`)).json()
+        if (r?.status && r?.download?.url) {
+          videoData = { link: r.download.url, title: r.metadata?.title }
+        }
+      } catch {}
 
       if (!videoData) {
         await conn.sendMessage(m.chat, { react: { text: "❌", key: m.key }})
-        return conn.reply(m.chat, "✦ Ninguna API respondió para el video. Intenta más tarde.", m)
+        return conn.reply(m.chat, "✦ No se pudo descargar el video. Intenta más tarde.", m)
       }
 
       await conn.sendFile(m.chat, videoData.link, (videoData.title || "video") + ".mp4", `✧ 𝗧𝗶́𝘁𝘂𝗹𝗼 » ${title}`, m)
