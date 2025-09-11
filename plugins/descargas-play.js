@@ -77,7 +77,7 @@ const handler = async (m, { conn, text, command }) => {
         audio: { url: audioData.link },
         fileName: `${audioData.title || "music"}.mp3`,
         mimetype: "audio/mpeg",
-        ptt: true
+        ptt: false
       }, { quoted: m })
 
       await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key }})
