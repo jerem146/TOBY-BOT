@@ -97,13 +97,10 @@ const handler = async (m, { conn, text, command }) => {
         return conn.reply(m.chat, "✦ No se pudo descargar el video. Intenta más tarde.", m)
       }
 
-      const response = await fetch(videoData.link)
-      const buffer = await response.buffer()
-
       await conn.sendMessage(m.chat, {
-        video: buffer,
+        video: { url: videoData.link },
         fileName: `${videoData.title || "video"}.mp4`,
-        caption: `${title}`,
+        caption: `✧ 𝗧𝗶́𝘁𝘂𝗹𝗼 » ${title}`,
         mimetype: "video/mp4"
       }, { quoted: m })
 
@@ -122,6 +119,7 @@ const handler = async (m, { conn, text, command }) => {
 
 handler.command = handler.help = ["play", "yta", "ytmp3", "play2", "ytv", "ytmp4", "playaudio", "mp4"]
 handler.tags = ["descargas"]
+handler.group = true
 
 export default handler
 
