@@ -73,13 +73,11 @@ const handler = async (m, { conn, text, command }) => {
         return conn.reply(m.chat, "✦ No se pudo descargar el audio. Intenta más tarde.", m)
       }
 
-      const res = await fetch(audioData.link)
-      const buffer = await res.buffer()
-
       await conn.sendMessage(m.chat, {
-        audio: buffer,
+        audio: { url: audioData.link },
         fileName: `${audioData.title || "music"}.mp3`,
-        mimetype: "audio/mpeg"
+        mimetype: "audio/mpeg",
+        ptt: true
       }, { quoted: m })
 
       await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key }})
@@ -102,7 +100,7 @@ const handler = async (m, { conn, text, command }) => {
       await conn.sendMessage(m.chat, {
         video: { url: videoData.link },
         fileName: `${videoData.title || "video"}.mp4`,
-        caption: `✧ 𝗧𝗶́𝘁𝘂𝗹𝗼 » ${title}`,
+        caption: `${title}`,
         mimetype: "video/mp4"
       }, { quoted: m })
 
@@ -121,6 +119,7 @@ const handler = async (m, { conn, text, command }) => {
 
 handler.command = handler.help = ["play", "yta", "ytmp3", "play2", "ytv", "ytmp4", "playaudio", "mp4"]
 handler.tags = ["descargas"]
+handler.group = true
 
 export default handler
 
