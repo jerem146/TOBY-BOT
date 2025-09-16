@@ -1,21 +1,32 @@
-import { normalizeJid } from './shouldBotRespond.js';
-
 let handler = async (m, { conn, text, usedPrefix, command }) => {
     const chat = global.db.data.chats[m.chat] || (global.db.data.chats[m.chat] = {});
 
-    if (!m.mentionedJid || m.mentionedJid.length === 0) {
-        const reset = text?.toLowerCase() === 'reset' || text?.toLowerCase() === 'resetbot' || text?.toLowerCase() === 'restablecer';
-        if (reset) {
-            if (!chat.botPrimario) return m.reply('《✧》 No hay ningún bot primario establecido en este grupo.');
-            chat.botPrimario = null;
-            if (global.db?.write) await global.db.write();
-            return m.reply('✐ Se ha restablecido la configuración. Ahora todos los bots responderán nuevamente en este grupo.');
+    const resetWords = ['reset', 'resetbot', 'resetprimario', 'botreset'];
+    const firstWord = (text || '').trim().split(/\s+/)[0]?.replace(/^[^a-z0-9]+/i, '').toLowerCase();
+
+    if (resetWords.includes(firstWord)) {
+        if (!chat.botPrimario) return m.reply('《✧》 No hay ningún bot primario en este grupo.');
+        chat.botPrimario = null;
+        if (global.db?.write) await global.db.write();
+        return m.reply('✐ Se restableció la configuración. Ahora todos los bots responderán nuevamente en este grupo.');
+    }
+
+    if (chat.botPrimario) {
+        const normalizeJid = jid => jid?.toLowerCase().replace(/:\d+@/, '@');
+        const connJid = normalizeJid(conn?.user?.id || conn?.user?.jid);
+        const primaryJid = normalizeJid(chat.botPrimario);
+
+        if (primaryJid && connJid !== primaryJid) {
+            return;
         }
-        return m.reply(`《✧》 Debes mencionar a un usuario (bot o persona) para establecerlo como primario.\nEj: ${usedPrefix + command} @tag`);
+    }
+
+    if (!m.mentionedJid || m.mentionedJid.length === 0) {
+        return m.reply(`《✧》 Debes mencionar a un usuario/bot para establecerlo como primario.\nEj: ${usedPrefix + command} @tag`);
     }
 
     const raw = m.mentionedJid[0];
-    const normalized = normalizeJid(raw);
+    const normalized = raw.toLowerCase().replace(/:\d+@/, '@');
 
     chat.botPrimario = normalized;
     if (global.db?.write) await global.db.write();
@@ -26,7 +37,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }, { quoted: m });
 };
 
-handler.help = ['setprimary @user'];
+handler.help = ['setprimary @user', 'resetbot'];
 handler.tags = ['grupo'];
 handler.command = ['setprimary', 'botprimario', 'setbot'];
 handler.group = true;
