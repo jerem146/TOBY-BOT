@@ -1,29 +1,36 @@
-import { normalizeJid } from '../utils.js';
-
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-    const chat = global.db.data.chats[m.chat] || (global.db.data.chats[m.chat] = {});
+    let chat = global.db.data.chats[m.chat];
 
     if (!m.mentionedJid || m.mentionedJid.length === 0) {
-        const reset = ['reset', 'resetbot', 'resetprimario', 'botreset'].includes(text?.toLowerCase());
+        let reset = text?.toLowerCase() === 'reset' || text?.toLowerCase() === 'restablecer' || text?.toLowerCase() === 'resetbot';
         if (reset) {
             if (!chat.botPrimario) return m.reply('《✧》 No hay ningún bot primario establecido en este grupo.');
+
             chat.botPrimario = null;
-            if (global.db?.write) await global.db.write();
-            return m.reply('✐ Configuración restablecida. Ahora todos los bots responderán en este grupo.');
+            if (global.db.write) await global.db.write();
+            await m.reply(`✐ Se ha restablecido la configuración. Ahora todos los bots responderán nuevamente.`);
+            return;
         }
-        return m.reply(`《✧》 Debes mencionar a un usuario para establecerlo como primario.\n\nEjemplo: ${usedPrefix + command} @usuario`);
+
+        return m.reply(`《✧》 Debes mencionar a un usuario (bot o humano) para establecerlo como primario.\n\n> *Ejemplo:* ${usedPrefix + command} @tag\n\n> ❀ También puedes usar *resetbot* (SIN PREFIJOS) para que todos los bots vuelvan a responder.`);
     }
 
-    const raw = m.mentionedJid[0];
-    const normalized = normalizeJid(raw);
-    chat.botPrimario = normalized;
-    if (global.db?.write) await global.db.write();
+    let botJid = m.mentionedJid[0];
 
-    await conn.sendMessage(m.chat, {
-        text: `✐ Se estableció como primario a *@${normalized.split('@')[0]}*`,
-        mentions: [normalized]
-    }, { quoted: m });
-};
+    if (chat.botPrimario === botJid) {
+        return conn.reply(m.chat, `✧ @${botJid.split('@')[0]} ya es el primario.`, m, { mentions: [botJid] });
+    }
+
+    chat.botPrimario = botJid;
+    if (global.db.write) await global.db.write();
+
+    let response = `✐ Se ha establecido a *@${botJid.split('@')[0]}* como primario de este grupo.
+> A partir de ahora, solo *@${botJid.split('@')[0]}* responderá a los comandos aquí.
+
+> *Nota:* Para restablecer la configuración, usa el comando \`resetbot\` (sin prefijo).`;
+
+    await conn.sendMessage(m.chat, { text: response, mentions: [botJid] }, { quoted: m });
+}
 
 handler.help = ['setprimary @user'];
 handler.tags = ['grupo'];
