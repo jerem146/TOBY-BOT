@@ -93,6 +93,10 @@ function shouldBotRespond(m, conn) {
 }
 
 
+console.log('DBG botPrimario:', global.db?.data?.chats?.[m.chat]?.botPrimario);
+console.log('DBG connJid:', conn?.user?.id || conn?.user?.jid);
+console.log('DBG conns:', (Array.isArray(global.conns) ? global.conns.map(c => c?.user?.id || c?.user?.jid) : global.conns));
+
 m.exp = 0
 m.coin = false
 try {
