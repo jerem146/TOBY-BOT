@@ -30,17 +30,68 @@ m = smsg(this, m) || m
 if (!m)
 return
 
-const chatDB = global.db.data.chats[m.chat];
-if (chatDB && chatDB.botPrimario) {
-    const universalWords = ['resetbot', 'resetprimario', 'botreset'];
-    const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
+/**
+ * Devuelve true si el bot actual (conn) debe responder el mensaje m,
+ * false si debe quedarse callado porque existe un bot primario distinto.
+ */
+function shouldBotRespond(m, conn) {
+  try {
+    const chatDB = (global.db && global.db.data && global.db.data.chats && global.db.data.chats[m.chat]) ? global.db.data.chats[m.chat] : null;
+    if (!chatDB || !chatDB.botPrimario) return true; // no hay primario -> todos responden
 
-    if (!universalWords.includes(firstWord)) {
-        if (chatDB.botPrimario !== this.user.jid) {
-            return;
-        }
+    // comandos que deben ser universales (todos los bots responderán)
+    const universalWords = new Set(['resetbot', 'resetprimario', 'botreset', 'reset']);
+    const text = (m.text || '').trim();
+    const first = text.split(/\s+/)[0]?.toLowerCase() || '';
+    // quitar prefijos comunes como '!' '.' '#' si existen (comprobamos con y sin)
+    const stripped = first.replace(/^[^a-z0-9]+/i, '');
+
+    if (universalWords.has(first) || universalWords.has(stripped)) return true;
+
+    // obtener jid de esta conexión de forma segura (compatibilidad entre versiones de Baileys)
+    const connJid = conn?.user?.id || conn?.user?.jid || null;
+    if (!connJid) {
+      // si por alguna razón la conexión no tiene user.jid -> no bloqueamos (evita silent-fail)
+      console.warn('[shouldBotRespond] conn no tiene user.id/jid, permitiendo respuesta por seguridad.');
+      return true;
     }
+
+    // si este conn es el primario -> permitir
+    if (chatDB.botPrimario === connJid) return true;
+
+    // buscar si el botPrimario coincide con alguna conexión activa
+    const conns = Array.isArray(global.conns) ? global.conns : [];
+    const primaryConn = conns.find(c => (c?.user?.id === chatDB.botPrimario || c?.user?.jid === chatDB.botPrimario));
+
+    if (primaryConn) {
+      // Existe un bot primario conectado y NO somos nosotros -> no responder
+      return false;
+    }
+
+    // Si llegamos aquí: botPrimario NO se corresponde con ninguna conexión activa.
+    // -> Fallback: asignar el primer bot conectado como nuevo primario para evitar que el grupo quede mudo.
+    if (conns.length > 0) {
+      const newPrimary = conns[0]?.user?.id || conns[0]?.user?.jid || null;
+      if (newPrimary) {
+        // actualizar DB para que no siga apuntando a un JID inexistente
+        global.db.data.chats[m.chat].botPrimario = newPrimary;
+        console.log(`[BotPrimario] Fallback: botPrimario inexistente. Se actualizó a ${newPrimary} para el chat ${m.chat}`);
+        // si soy el nuevo primario permito, si no, bloqueo
+        return (connJid === newPrimary);
+      }
+    }
+
+    // No hay clones conectados -> limpiamos la configuración para que todos respondan
+    global.db.data.chats[m.chat].botPrimario = null;
+    console.log(`[BotPrimario] No hay conexiones activas. Se limpió botPrimario en ${m.chat}`);
+    return true;
+  } catch (e) {
+    console.error('[shouldBotRespond] error:', e);
+    // en caso de error inesperado, mejor permitir respuesta que dejar todo mudo
+    return true;
+  }
 }
+
 
 m.exp = 0
 m.coin = false
