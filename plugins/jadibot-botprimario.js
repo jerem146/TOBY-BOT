@@ -12,41 +12,21 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
             return;
         }
 
-        return m.reply(`《✧》 Debes mencionar a un bot del grupo para establecerlo como primario.\n\n> *Ejemplo:* ${usedPrefix + command} @tagdelbot\n\n> ❀ También puedes usar *resetbot* (SIN PREFIJOS) para que todos los bots vuelvan a responder.`);
+        return m.reply(`《✧》 Debes mencionar a un usuario (bot o persona) para establecerlo como primario.\n\n> *Ejemplo:* ${usedPrefix + command} @tag\n\n> ❀ También puedes usar *resetbot* (SIN PREFIJOS) para que todos los bots vuelvan a responder.`);
     }
 
     let botJid = m.mentionedJid[0];
 
-    // obtener lista de conexiones disponibles
-    const users = global.conns && Array.isArray(global.conns) ? global.conns : [];
-
-    let selectedBot;
-
-    // si es este mismo bot
-    if (botJid === conn.user.id || botJid === conn.user.jid) {
-        selectedBot = conn;
-    } else {
-        // buscar entre los clones disponibles
-        selectedBot = users.find(sub => 
-            sub?.user?.id === botJid || sub?.user?.jid === botJid
-        );
-    }
-
-    if (!selectedBot) {
-        return conn.reply(m.chat, `✧ El usuario mencionado no es un bot conectado actualmente.`, m);
-    }
-
     if (chat.botPrimario === botJid) {
-        return conn.reply(m.chat, `✧ @${botJid.split('@')[0]} ya es el bot primario.`, m, { mentions: [botJid] });
+        return conn.reply(m.chat, `✧ @${botJid.split('@')[0]} ya es el primario.`, m, { mentions: [botJid] });
     }
 
     chat.botPrimario = botJid;
 
-    let botName = await conn.getName(botJid);
-    let response = `✐ Se ha establecido a *@${botJid.split('@')[0]}* como bot primario de este grupo.
-> A partir de ahora, todos los comandos del grupo serán ejecutados por *@${botJid.split('@')[0]}*.
+    let response = `✐ Se ha establecido a *@${botJid.split('@')[0]}* como primario de este grupo.
+> A partir de ahora, solo *@${botJid.split('@')[0]}* responderá a los comandos aquí.
 
-> *Nota:* Si sucede algún inconveniente, puedes restablecer la configuración usando el comando \`resetbot\` (sin prefijo).`;
+> *Nota:* Si quieres desactivar esta configuración, usa el comando \`resetbot\` (sin prefijo).`;
 
     await conn.sendMessage(m.chat, { 
         text: response, 
@@ -54,9 +34,9 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }, { quoted: m });
 }
 
-handler.help = ['setbotprimario @bot', 'setbot @bot'];
+handler.help = ['setprimary @user'];
 handler.tags = ['grupo'];
-handler.command = ['setprimary', 'botprimario', 'setprimarybot', 'setbot'];
+handler.command = ['setprimary', 'botprimario', 'setbot'];
 handler.group = true;
 handler.admin = true;
 
