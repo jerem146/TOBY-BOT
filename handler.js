@@ -5,7 +5,7 @@ import path, { join } from 'path'
 import { unwatchFile, watchFile } from 'fs'
 import chalk from 'chalk'
 import fetch from 'node-fetch'
-import failureHandler from './lib/respuesta.js'; // << AÑADIDO: Importación de la librería de respuesta
+import failureHandler from './lib/respuesta.js';
 
 const { proto } = (await import('@whiskeysockets/baileys')).default
 const isNumber = x => typeof x === 'number' && !isNaN(x)
@@ -116,7 +116,7 @@ if (!('nsfw' in chat)) chat.nsfw = false
 if (!('antifake' in chat)) chat.antifake = false
 if (!('delete' in chat)) chat.delete = false
 if (!isNumber(chat.expired)) chat.expired = 0
-if (!('botPrimario' in chat)) chat.botPrimario = null // << AÑADIDO
+if (!('botPrimario' in chat)) chat.botPrimario = null
 } else
 global.db.data.chats[m.chat] = {
 isBanned: false, sAutoresponder: '', welcome: true, autolevelup: false, autoresponder: false, delete: false, autoAceptar: false, autoRechazar: false, detect: true, antiBot: false, antiBot2: false,
@@ -430,6 +430,7 @@ if (!m.fromMe) return this.sendMessage(m.chat, { react: { text: emot, key: m.key
 function pickRandom(list) { return list[Math.floor(Math.random() * list.length)]}
 }}
 
+// << REEMPLAZADO: global.dfail ahora usa la librería de respuesta >>
 global.dfail = (type, m, conn) => { failureHandler(type, conn, m); };
 
 let file = global.__filename(import.meta.url, true)
