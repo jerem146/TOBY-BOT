@@ -51,8 +51,8 @@ export async function handler(chatUpdate) {
         m = smsg(this, m) || m
         if (!m) return
 
-        const chatDB = global.db.data.chats[m.chat];
-        if (chatDB?.botPrimario && chatDB.botPrimario !== this.user.jid) {
+        const initialChat = global.db.data.chats[m.chat];
+        if (initialChat?.botPrimario && initialChat.botPrimario !== this.user.jid) {
             const universalWords = ['resetbot', 'resetprimario', 'botreset'];
             const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
             if (!universalWords.includes(firstWord)) {
@@ -65,18 +65,10 @@ export async function handler(chatUpdate) {
 
         try {
             const user = global.db.data.users[m.sender];
-            if (user) {
-                global.db.data.users[m.sender] = { ...defaultUser, ...user, name: m.name };
-            } else {
-                global.db.data.users[m.sender] = { ...defaultUser, name: m.name };
-            }
+            global.db.data.users[m.sender] = { ...defaultUser, ...(user || {}), name: m.name };
             
             const chat = global.db.data.chats[m.chat];
-            if (chat) {
-                global.db.data.chats[m.chat] = { ...defaultChat, ...chat };
-            } else {
-                global.db.data.chats[m.chat] = { ...defaultChat };
-            }
+            global.db.data.chats[m.chat] = { ...defaultChat, ...(chat || {}) };
 
             let settings = global.db.data.settings[this.user.jid]
             if (typeof settings !== 'object') global.db.data.settings[this.user.jid] = {}
@@ -135,14 +127,14 @@ export async function handler(chatUpdate) {
             if ((usedPrefix = (match[0] || '')[0])) {
                 const groupMetadata = m.isGroup ? ((conn.chats[m.chat] || {}).metadata || await this.groupMetadata(m.chat).catch(_ => null)) : {}
                 const participants = m.isGroup ? (groupMetadata.participants || []) : []
-                const user = m.isGroup ? participants.find(p => p.id === m.sender) || {} : {}
+                const senderParticipant = m.isGroup ? participants.find(p => p.id === m.sender) || {} : {}
                 const bot = m.isGroup ? participants.find(p => p.id === conn.user.jid) || {} : {}
-                const isRAdmin = user?.admin === "superadmin"
-                const isAdmin = isRAdmin || user?.admin === "admin"
+                const isRAdmin = senderParticipant?.admin === "superadmin"
+                const isAdmin = isRAdmin || senderParticipant?.admin === "admin"
                 const isBotAdmin = !!bot?.admin
                 
                 if (typeof plugin.before === 'function') {
-                    if (await plugin.before.call(this, m, { match, conn: this, participants, groupMetadata, user, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename }))
+                    if (await plugin.before.call(this, m, { match, conn: this, participants, groupMetadata, user: senderParticipant, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename }))
                     continue
                 }
                 
@@ -164,11 +156,10 @@ export async function handler(chatUpdate) {
 
                 m.plugin = name
                 let chat = global.db.data.chats[m.chat]
-                let user = global.db.data.users[m.sender]
                 
                 if (chat?.isBanned && !isROwner && !['grupo-unbanchat.js', 'owner-exec.js', 'owner-exec2.js'].includes(name)) return
-                if (user?.banned && !isROwner && !['owner-unbanuser.js'].includes(name)) {
-                    return m.reply(`《✦》Estas baneado/a, no puedes usar comandos en este bot!\n\n${user.bannedReason ? `✰ *Motivo:* ${user.bannedReason}` : '✰ *Motivo:* Sin Especificar'}`)
+                if (_user?.banned && !isROwner && !['owner-unbanuser.js'].includes(name)) {
+                    return m.reply(`《✦》Estas baneado/a, no puedes usar comandos en este bot!\n\n${_user.bannedReason ? `✰ *Motivo:* ${_user.bannedReason}` : '✰ *Motivo:* Sin Especificar'}`)
                 }
                 
                 if (chat?.modoadmin && !isAdmin && !isOwner && m.isGroup) return
@@ -186,14 +177,14 @@ export async function handler(chatUpdate) {
                 m.isCommand = true
                 let xp = 'exp' in plugin ? parseInt(plugin.exp) : 10
                 m.exp += xp
-                if (!isPrems && plugin.coin && user.coin < plugin.coin * 1) {
+                if (!isPrems && plugin.coin && _user.coin < plugin.coin * 1) {
                     return conn.reply(m.chat, `❮✦❯ Se agotaron tus ${moneda}`, m)
                 }
                 if (plugin.level > _user.level) {
                     return conn.reply(m.chat, `❮✦❯ Se requiere el nivel: *${plugin.level}*\n\n• Tu nivel actual es: *${_user.level}*\n\n• Usa este comando para subir de nivel:\n*${usedPrefix}levelup*`, m)
                 }
 
-                let extra = { match, usedPrefix, noPrefix, _args, args, command, text, conn: this, participants, groupMetadata, user, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename }
+                let extra = { match, usedPrefix, noPrefix, _args, args, command, text, conn: this, participants, groupMetadata, user: senderParticipant, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename }
                 
                 try {
                     await plugin.call(this, m, extra)
