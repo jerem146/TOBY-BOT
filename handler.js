@@ -30,10 +30,6 @@ m = smsg(this, m) || m
 if (!m)
 return
 
-let chatDB = global.db.data.chats[m.chat];
-if (chatDB?.botPrimario && chatDB.botPrimario !== (conn.user.id || conn.user.jid)) {
-    return;
-}
 
 m.exp = 0
 m.coin = false
