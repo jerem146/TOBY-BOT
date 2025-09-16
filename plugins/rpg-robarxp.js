@@ -13,7 +13,6 @@ const handler = async (m, { conn, usedPrefix, command }) => {
     return conn.reply(m.chat, `${emoji3} Debes esperar ${time} para usar *#robxp* de nuevo.`, m);
   }
 
-  // determinar objetivo
   let who = null;
   if (m.isGroup) {
     who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : null;
