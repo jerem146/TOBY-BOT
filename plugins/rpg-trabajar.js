@@ -2,12 +2,15 @@ let cooldowns = {};
 
 const handler = async (m, { conn }) => {
     let user = global.db.data.users[m.sender];
+    if (!user.coin) user.coin = 0;
+    if (!user.bank) user.bank = 0;
+
     const premiumBenefit = user.premium ? 1.25 : 1.0;
     const cooldown = 3 * 60 * 1000;
 
     if (cooldowns[m.sender] && Date.now() - cooldowns[m.sender] < cooldown) {
         const remaining = segundosAHMS(Math.ceil((cooldowns[m.sender] + cooldown - Date.now()) / 1000));
-        return conn.reply(m.chat, `🥵 Tómate un descanso, ya trabajaste mucho. Vuelve en *${remaining}*.`, m);
+        return conn.reply(m.chat, `💛 Tómate un descanso, ya trabajaste mucho. Vuelve en *${remaining}*.`, m);
     }
 
     const winChance = 0.85;
@@ -17,12 +20,22 @@ const handler = async (m, { conn }) => {
         const amount = Math.floor((Math.random() * 4000 + 1000) * premiumBenefit);
         user.coin += amount;
         const work = pickRandom(trabajosBuenos);
-        await conn.reply(m.chat, `✿ ${work} y te llevaste *¥${amount.toLocaleString()} ${moneda}*.`, m);
+        await conn.reply(m.chat, `✿ ${work} y te llevaste *¥${amount.toLocaleString()} ${moneda}*.\n\n💰 Cartera: *¥${user.coin.toLocaleString()}* | 🏦 Banco: *¥${user.bank.toLocaleString()}*`, m);
     } else {
         const amount = Math.floor(Math.random() * 3000 + 500);
-        user.coin = Math.max(0, user.coin - amount);
+        let total = user.coin + user.bank;
+        let loss = Math.min(total, amount);
+
+        if (user.coin >= loss) {
+            user.coin -= loss;
+        } else {
+            let resto = loss - user.coin;
+            user.coin = 0;
+            user.bank = Math.max(0, user.bank - resto);
+        }
+
         const work = pickRandom(trabajosMalos);
-        await conn.reply(m.chat, `🥀 ${work} y perdiste *¥${amount.toLocaleString()} ${moneda}*.`, m);
+        await conn.reply(m.chat, `🥀 ${work} y perdiste *¥${amount.toLocaleString()} ${moneda}*.\n\n💰 Cartera: *¥${user.coin.toLocaleString()}* | 🏦 Banco: *¥${user.bank.toLocaleString()}*`, m);
     }
 
     cooldowns[m.sender] = Date.now();
@@ -52,7 +65,7 @@ const trabajosBuenos = [
     "Programaste un troyano para un político y te pagó bien",
     "Vendiste fotos de tus patas en OnlyFans",
     "Ganaste un torneo local de Street Fighter",
-    "Hiciste de extra en una película porno de bajo presupuesto",
+    "Hiciste de extra en una película de bajo presupuesto",
     "Te contrataron para cuidar el perro de un millonario",
     "Vendiste agua embotellada del grifo afuera de un concierto",
     "Hackeaste la red del vecino y le vendiste su propio internet",
