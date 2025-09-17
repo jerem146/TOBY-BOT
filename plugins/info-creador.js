@@ -25,7 +25,7 @@ async function handler(m, { conn }) {
       biografia: await conn.fetchStatus('18096758983@s.whatsapp.net').then(res => res.status).catch(_ => 'Sin biografía')
     },
     {
-      numero: '5216671548329',
+      numero: '52166715×××××',
       nombre: '⏤͟͞ू⃪ ꒰˘͈ᵕ ˘͈ 𝑳𝒆𝒈𝒏𝒂-𝒄𝒉𝒂𝒏 🪽 ꒱𖦹',
       cargo: 'Co-Desarrolladora y contribudora',
       nota: 'Resolucion de probremas',
