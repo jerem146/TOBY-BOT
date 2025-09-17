@@ -3,32 +3,49 @@ let cooldowns = {};
 const handler = async (m, { conn }) => {
     const users = global.db.data.users;
     const senderId = m.sender;
+
+    if (typeof users[senderId].coin !== "number") users[senderId].coin = 0;
+    if (typeof users[senderId].bank !== "number") users[senderId].bank = 0;
+
     const premiumBenefit = users[senderId].premium ? 1.30 : 1.0;
     const cooldown = 5 * 60 * 1000;
 
     if (cooldowns[senderId] && Date.now() - cooldowns[senderId] < cooldown) {
         const remaining = segundosAHMS(Math.ceil((cooldowns[senderId] + cooldown - Date.now()) / 1000));
-        return m.reply(`🥵 Necesitas recuperar el aliento. Vuelve a la esquina en *${remaining}*.`);
+        return m.reply(`🥵 Necesitas recuperar el aliento. Vuelve en *${remaining}*.`);
     }
 
     const winChance = 0.65;
     const didWin = Math.random() < winChance;
-    
-    let targetId = Object.keys(users).filter(u => u !== senderId && !users[u].banned)[Math.floor(Math.random() * (Object.keys(users).length - 1))];
+
+    let userIds = Object.keys(users).filter(u => u !== senderId && !users[u].banned);
+    let targetId = userIds.length > 0 ? userIds[Math.floor(Math.random() * userIds.length)] : senderId;
 
     if (didWin) {
         const amount = Math.floor((Math.random() * 10000 + 4000) * premiumBenefit);
         users[senderId].coin += amount;
+
         const phrase = pickRandom(frasesGanancia).replace('@usuario', `@${targetId.split('@')[0]}`);
         await conn.sendMessage(m.chat, {
-            text: `✨ ${phrase} y ganaste *¥${amount.toLocaleString()} ${moneda}*.\n> Tu nuevo saldo es *¥${users[senderId].coin.toLocaleString()}*`,
+            text: `✨ ${phrase} y ganaste *¥${amount.toLocaleString()} ${moneda}*.`,
             contextInfo: { mentionedJid: [targetId] }
         }, { quoted: m });
+
     } else {
-        const amount = Math.floor(Math.random() * 18000 + 8000); // Pérdidas altas
-        users[senderId].coin = Math.max(0, users[senderId].coin - amount);
+        const amount = Math.floor(Math.random() * 18000 + 8000); // pérdidas altas
+        let total = users[senderId].coin + users[senderId].bank;
+        let loss = Math.min(total, amount);
+
+        if (users[senderId].coin >= loss) {
+            users[senderId].coin -= loss;
+        } else {
+            let resto = loss - users[senderId].coin;
+            users[senderId].coin = 0;
+            users[senderId].bank = Math.max(0, users[senderId].bank - resto);
+        }
+
         const phrase = pickRandom(frasesPerdida);
-        await conn.reply(m.chat, `💔 ${phrase} y perdiste la terrible suma de *¥${amount.toLocaleString()} ${moneda}*.\n> Te quedaste con *¥${users[senderId].coin.toLocaleString()}*.`, m);
+        await conn.reply(m.chat, `💔 ${phrase} y perdiste *¥${loss.toLocaleString()} ${moneda}*.`, m);
     }
 
     cooldowns[senderId] = Date.now();
