@@ -3,42 +3,42 @@ import PhoneNumber from 'awesome-phonenumber';
 import fetch from 'node-fetch';
 
 let handler = async (m, { conn, args }) => {
-  let userId = m.quoted?.sender || m.mentionedJid?.[0] || m.sender;
-  let user = global.db.data.users[userId];
+    let userId;
+    if (m.quoted && m.quoted.sender) {
+        userId = m.quoted.sender;
+    } else {
+        userId = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.sender;
+    }
 
-  // Valido estado premium actual xd 
-  if (user.premium && user.premiumTime && user.premiumTime < Date.now()) {
-    user.premium = false;
-  }
+    let user = global.db.data.users[userId];
+    let name = await conn.getName(userId);
+    let cumpleanos = user.birth || 'No especificado';
+    let genero = user.genre || 'No especificado';
+    let parejaId = user.marry || null;
+    let parejaText = 'Nadie';
+    let mentions = [userId];
 
-  const isPremium = user.premium;
-  const premiumRestante = isPremium ? await formatTime(user.premiumTime - Date.now()) : '';
+    if (parejaId) {
+        let parejaName = await conn.getName(parejaId);
+        parejaText = `@${parejaId.split('@')[0]} (${parejaName})`;
+        mentions.push(parejaId);
+    }
 
-  let name = await conn.getName(userId);
-  let cumpleanos = user.birth || 'No especificado';
-  let genero = user.genre || 'No especificado';
-  let pareja = user.marry || 'Nadie';
-  let description = user.description || 'Sin descripción';
-  let exp = user.exp || 0;
-  let nivel = user.level || 0;
-  let role = user.role || 'Sin Rango';
-  let coins = user.coin || 0;
-  let bankCoins = user.bank || 0;
-  let edad = user.age || 'Desconocida';
+    let description = user.description || 'Sin descripción';
+    let exp = user.exp || 0;
+    let nivel = user.level || 0;
+    let role = user.role || 'Sin Rango';
+    let coins = user.coin || 0;
+    let bankCoins = user.bank || 0;
 
-  let avatar = await conn.profilePictureUrl(userId, 'image').catch(_ => 'https://files.catbox.moe/xr2m6u.jpg');
-  const backgroundURL = encodeURIComponent('https://i.ibb.co.com/2jMjYXK/IMG-20250103-WA0469.jpg');
-  const avatarURL = encodeURIComponent(avatar);
+    let perfil = await conn.profilePictureUrl(userId, 'image').catch(_ => 'https://files.catbox.moe/xr2m6u.jpg');
 
-  const imageAPI = `https://api.siputzx.my.id/api/canvas/profile?backgroundURL=${backgroundURL}&avatarURL=${avatarURL}&rankName=${encodeURIComponent(role)}&rankId=0&exp=${exp}&requireExp=0&level=${nivel}&name=${encodeURIComponent(name)}`;
-
-  try {
-    await conn.sendFile(m.chat, imageAPI, 'perfil.jpg', `
+    let profileText = `
 「✿」Perfil de @${userId.split('@')[0]}
-✦ Edad: ${edad}
+✦ Edad: ${user.age || 'Desconocida'}
 ♛ Cumpleaños: ${cumpleanos}
 ⚥ Género: ${genero}
-♡ Casado con: ${pareja}
+♡ Casado con: ${parejaText}
 
 ✎ Rango: ${role}
 ☆ Exp: ${exp.toLocaleString()}
@@ -46,34 +46,30 @@ let handler = async (m, { conn, args }) => {
 
 ⛁ Coins Cartera: ${coins.toLocaleString()} ${moneda}
 ⛃ Coins Banco: ${bankCoins.toLocaleString()} ${moneda}
-❁ Premium: ${isPremium ? `✅ (Restante: ${premiumRestante})` : '❌'}
+❁ Premium: ${user.premium ? '✅' : '❌'}
 
 📝 Descripción: ${description}
-`.trim(), m, false, { mentions: [userId] });
-  } catch (e) {
-    await conn.reply(m.chat, '❌ Error al generar el perfil.', m);
-    console.error(e);
-  }
+`.trim();
+
+    await conn.sendMessage(m.chat, { 
+        text: profileText,
+        mentions,
+        contextInfo: {
+            mentionedJid: mentions,
+            externalAdReply: {
+                title: '✧ Perfil de Usuario ✧',
+                body: dev,
+                thumbnailUrl: perfil,
+                mediaType: 1,
+                showAdAttribution: true,
+                renderLargerThumbnail: true
+            }
+        }
+    }, { quoted: m });
 };
 
-handler.help = ['profile', 'perfil'];
+handler.help = ['profile'];
 handler.tags = ['rg'];
 handler.command = ['profile', 'perfil'];
 
 export default handler;
-
-async function formatTime(ms) {
-  let seconds = Math.floor(ms / 1000);
-  let minutes = Math.floor(seconds / 60);
-  let hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-  seconds %= 60;
-  minutes %= 60;
-  hours %= 24;
-  let timeString = '';
-  if (days) timeString += `${days} día${days > 1 ? 's' : ''} `;
-  if (hours) timeString += `${hours} hora${hours > 1 ? 's' : ''} `;
-  if (minutes) timeString += `${minutes} minuto${minutes > 1 ? 's' : ''} `;
-  if (seconds) timeString += `${seconds} segundo${seconds > 1 ? 's' : ''} `;
-  return timeString.trim();
-}
