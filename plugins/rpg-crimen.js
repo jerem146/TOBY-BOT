@@ -4,7 +4,9 @@ let jail = {};
 const handler = async (m, { conn }) => {
     let users = global.db.data.users;
     let senderId = m.sender;
-    const premiumBenefit = users[senderId].premium ? 0.8 : 1.0;
+    const user = users[senderId];
+
+    const premiumBenefit = user.premium ? 0.8 : 1.0;
     const cooldown = 5 * 60 * 1000;
     const jailCooldown = 30 * 60 * 1000;
 
@@ -28,14 +30,33 @@ const handler = async (m, { conn }) => {
         return m.reply(`🚓 ${reason}. Estás en la cárcel por 30 minutos.`);
     } else if (outcome < jailChance + successChance) {
         const amount = Math.floor(Math.random() * 15000 + 5000);
-        users[senderId].coin += amount;
+        user.coin += amount;
         const reason = pickRandom(frasesExito);
-        await m.reply(`💰 ${reason} y te embolsaste *¥${amount.toLocaleString()} ${moneda}*.\n> Tu saldo: *¥${users[senderId].coin.toLocaleString()}*.`);
+        await m.reply(`💰 ${reason} y te embolsaste *¥${amount.toLocaleString()} ${moneda}*.\n> Tu saldo: *¥${user.coin.toLocaleString()}* en cartera, *¥${user.bank.toLocaleString()}* en banco.`);
     } else {
-        const amount = Math.floor(Math.random() * 25000 + 10000); // Pérdidas muy altas
-        users[senderId].coin = Math.max(0, users[senderId].coin - amount);
+        const amount = Math.floor(Math.random() * 25000 + 10000);
+        let restante = amount;
+
+        if (user.coin >= restante) {
+            user.coin -= restante;
+            restante = 0;
+        } else {
+            restante -= user.coin;
+            user.coin = 0;
+        }
+
+        if (restante > 0) {
+            if (user.bank >= restante) {
+                user.bank -= restante;
+                restante = 0;
+            } else {
+                restante -= user.bank;
+                user.bank = 0;
+            }
+        }
+
         const reason = pickRandom(frasesFracaso);
-        await m.reply(`💀 ${reason} y perdiste *¥${amount.toLocaleString()} ${moneda}* en el proceso.\n> Te quedaste con: *¥${users[senderId].coin.toLocaleString()}*.`);
+        await m.reply(`💀 ${reason} y perdiste *¥${amount.toLocaleString()} ${moneda}* en el proceso.\n> Te queda: *¥${user.coin.toLocaleString()}* en cartera, *¥${user.bank.toLocaleString()}* en banco.`);
     }
 
     cooldowns[senderId] = Date.now();
