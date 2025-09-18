@@ -41,38 +41,6 @@ m = smsg(this, m) || m
 if (!m)
 return
 
-function normalizeJid(jid) {
-  if (!jid) return null
-  jid = String(jid).toLowerCase()
-  jid = jid.replace(/:\d+@/, '@')
-  return jid
-}
-function bare(jid) {
-  if (!jid) return null
-  return String(jid).split('@')[0].split(':')[0]
-}
-
-if (global.db.data.chats[m.chat].primaryBot && normalizeJid(global.db.data.chats[m.chat].primaryBot) !== normalizeJid(this.user.jid)) {
-  const primaryBotConn = global.conns.find(conn =>
-    normalizeJid(conn.user.jid) === normalizeJid(global.db.data.chats[m.chat].primaryBot) &&
-    conn.ws.socket &&
-    conn.ws.socket.readyState !== ws.CLOSED
-  )
-  const participants = m.isGroup
-    ? (await this.groupMetadata(m.chat).catch(() => ({ participants: [] }))).participants
-    : []
-  const primaryBotInGroup = participants.some(p =>
-    normalizeJid(p.jid) === normalizeJid(global.db.data.chats[m.chat].primaryBot)
-  )
-  if (primaryBotConn && primaryBotInGroup || normalizeJid(global.db.data.chats[m.chat].primaryBot) === normalizeJid(global.conn.user.jid)) {
-    throw !1
-  } else {
-    // global.db.data.chats[m.chat].primaryBot = null
-  }
-} else {
-}
-
-
 m.exp = 0
 m.coin = false
 try {
