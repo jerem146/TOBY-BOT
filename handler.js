@@ -39,7 +39,19 @@ await global.loadDatabase()       
 try {
 m = smsg(this, m) || m
 if (!m)
-rretur
+return
+
+const chatDB = global.db.data.chats[m.chat];
+if (chatDB && chatDB.botPrimario) {
+    const universalWords = ['resetbot', 'resetprimario', 'botreset'];
+    const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
+
+    if (!universalWords.includes(firstWord)) {
+        if (chatDB.botPrimario !== this.user.jid) {
+            return;
+        }
+    }
+}
 
 m.exp = 0
 m.coin = false
@@ -167,8 +179,10 @@ if (!('sAutoresponder' in chat))
 chat.sAutoresponder = ''
 if (!('welcome' in chat))
 chat.welcome = true
-if (!('welcomeText' in chat)) chat.welcomeText = null
-if (!('byeText' in chat)) chat.byeText = null
+if (!('welcomeText' in chat)) 
+chat.welcomeText = null
+if (!('byeText' in chat)) 
+chat.byeText = null
 if (!('autolevelup' in chat))
 chat.autolevelup = false
 if (!('autoAceptar' in chat))
@@ -445,16 +459,20 @@ if (plugin.premium && !isPrems) { 
 fail('premium', m, this)
 continue
 }
+if (plugin.group && !m.isGroup) { 
+fail('group', m, this)
+continue
+}
+if (plugin.botAdmin && !isBotAdmin) { 
+fail('botAdmin', m, this)
+continue
+}
  if (plugin.admin && !isAdmin) { 
 fail('admin', m, this)
 continue
 }
 if (plugin.private && m.isGroup) {
 fail('private', m, this)
-continue
-}
-if (plugin.group && !m.isGroup) { 
-fail('group', m, this)
 continue
 }
 if (plugin.register == true && _user.registered == false) { 
