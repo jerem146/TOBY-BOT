@@ -18,7 +18,12 @@ let handler = async (m, { conn }) => {
   }
 
   try {
-    let name = await conn.getName(userId).catch(() => 'Sin Nombre')
+    let name
+    try {
+      name = await conn.getName(userId)
+    } catch {
+      name = "Sin Nombre"
+    }
 
     let cumpleanos = user.birth || 'No especificado'
     let genero = user.genre || 'No especificado'
@@ -45,6 +50,7 @@ let handler = async (m, { conn }) => {
 「✿」 *Perfil* ◢@${userId.split('@')[0]}◤
 ${description}
 
+✦ Nombre » ${name}
 ✦ Edad » ${user.age || 'Desconocida'}
 ♛ Cumpleaños » ${cumpleanos}
 ⚥ Género » ${genero}
