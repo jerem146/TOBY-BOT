@@ -39,19 +39,7 @@ await global.loadDatabase()       
 try {
 m = smsg(this, m) || m
 if (!m)
-return
-
-const chatDB = global.db.data.chats[m.chat];
-if (chatDB && chatDB.botPrimario) {
-    const universalWords = ['resetbot', 'resetprimario', 'botreset'];
-    const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
-
-    if (!universalWords.includes(firstWord)) {
-        if (chatDB.botPrimario !== this.user.jid) {
-            return;
-        }
-    }
-}
+rretur
 
 m.exp = 0
 m.coin = false
