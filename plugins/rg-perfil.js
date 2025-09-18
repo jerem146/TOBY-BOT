@@ -11,17 +11,16 @@ let handler = async (m, { conn, args }) => {
     }
 
     let user = global.db.data.users[userId];
-
     let name = await conn.getName(userId);
+
     let cumpleanos = user.birth || 'No especificado';
     let genero = user.genre || 'No especificado';
-    let parejaId = user.marry || null;
-    let parejaText = 'Nadie';
-    let mentions = [userId];
 
+    let parejaId = user.marry || null;
+    let parejaTag = 'Nadie';
+    let mentions = [userId];
     if (parejaId) {
-        let parejaName = await conn.getName(parejaId);
-        parejaText = `@${parejaId.split('@')[0]} (${parejaName})`;
+        parejaTag = `@${parejaId.split('@')[0]}`;
         mentions.push(parejaId);
     }
 
@@ -41,7 +40,7 @@ ${description}
 ✦ Edad » ${user.age || 'Desconocida'}
 ♛ *Cumpleaños* » ${cumpleanos}
 ⚥ *Género* » ${genero}
-♡ *Casado con* » ${parejaText}
+♡ *Casado con* » ${parejaTag}
 
 ☆ *Experiencia* » ${exp.toLocaleString()}
 ❖ *Nivel* » ${nivel}
@@ -54,7 +53,6 @@ ${description}
 
     await conn.sendMessage(m.chat, { 
         text: profileText,
-        mentions,
         contextInfo: {
             mentionedJid: mentions,
             externalAdReply: {
