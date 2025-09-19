@@ -1,54 +1,73 @@
 import axios from 'axios'
-const {proto, generateWAMessageFromContent, prepareWAMessageMedia, generateWAMessageContent, getDevice} = (await import("@whiskeysockets/baileys")).default
+import baileys from '@whiskeysockets/baileys'
 
-let handler = async (message, { conn, text, usedPrefix, command }) => {
-if (!text) return conn.reply(message.chat, `${emoji} Por favor, ingrese lo que desea buscar en tiktok.`, message)
-async function createVideoMessage(url) {
-const { videoMessage } = await generateWAMessageContent({ video: { url } }, { upload: conn.waUploadToServer })
-return videoMessage
+const { generateWAMessageFromContent } = baileys
+
+async function sendAlbumMessage(jid, medias, options = {}) {
+  if (typeof jid !== "string") throw new TypeError(`jid must be string, received: ${jid}`)
+  if (medias.length < 2) throw new RangeError("Se necesitan al menos 2 videos para un álbum")
+
+  const caption = options.text || options.caption || ""
+  const delay = !isNaN(options.delay) ? options.delay : 500
+  delete options.text
+  delete options.caption
+  delete options.delay
+
+  const album = baileys.generateWAMessageFromContent(
+    jid,
+    { messageContextInfo: {}, albumMessage: { expectedImageCount: medias.length } },
+    {}
+  )
+
+  await conn.relayMessage(album.key.remoteJid, album.message, { messageId: album.key.id })
+
+  for (let i = 0; i < medias.length; i++) {
+    const { type, data } = medias[i]
+    const msg = await baileys.generateWAMessage(
+      album.key.remoteJid,
+      { [type]: data, ...(i === 0 ? { caption } : {}) },
+      { upload: conn.waUploadToServer }
+    )
+    await conn.relayMessage(msg.key.remoteJid, msg.message, { messageId: msg.key.id })
+    await baileys.delay(delay)
+  }
+  return album
 }
-async function shuffleArray(array) {
-for (let i = array.length - 1; i > 0; i--) {
-const j = Math.floor(Math.random() * (i + 1));
-[array[i], array[j]] = [array[j], array[i]]
+
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+  if (!text) {
+    return conn.reply(m.chat, `${emoji} Por favor, ingrese lo que desea buscar en tiktok.`, m)
+  }
+
+  try {
+    await m.react(rwait)
+    conn.reply(m.chat, `${emoji2} Descargando sus videos, espere un momento...`, m)
+
+    let { data: response } = await axios.get('https://apis-starlights-team.koyeb.app/starlight/tiktoksearch?text=' + text)
+    let searchResults = response.data
+
+    if (!Array.isArray(searchResults) || searchResults.length < 2) {
+      return conn.reply(m.chat, '💦 No encontré suficientes resultados para mostrar un álbum.', m)
+    }
+
+    searchResults.sort(() => Math.random() - 0.5)
+    let selectedResults = searchResults.slice(0, 5)
+
+    const medias = selectedResults.map(video => ({
+      type: "video",
+      data: { url: video.nowm }
+    }))
+
+    const caption = `${emoji} Resultado de: ${text}\n⪛✰ TikTok - Búsquedas ✰⪜`
+
+    await sendAlbumMessage(m.chat, medias, { caption, quoted: m })
+    await m.react(done)
+
+  } catch (error) {
+    console.error(error)
+    await conn.reply(m.chat, error.toString(), m)
+  }
 }
-}
-try {
-await message.react(rwait)
-conn.reply(message.chat, `${emoji2} Descargando Su Video, espere un momento...`, message)
-let results = []
-let { data: response } = await axios.get('https://apis-starlights-team.koyeb.app/starlight/tiktoksearch?text=' + text)
-let searchResults = response.data
-shuffleArray(searchResults)
-let selectedResults = searchResults.splice(0, 7)
-for (let result of selectedResults) {
-results.push({
-body: proto.Message.InteractiveMessage.Body.fromObject({ text: null }),
-footer: proto.Message.InteractiveMessage.Footer.fromObject({ text: dev }),
-header: proto.Message.InteractiveMessage.Header.fromObject({
-title: '' + result.title,
-hasMediaAttachment: true,
-videoMessage: await createVideoMessage(result.nowm)
-}),
-nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({ buttons: [] })})}
-const responseMessage = generateWAMessageFromContent(message.chat, {
-viewOnceMessage: {
-message: {
-messageContextInfo: {
-deviceListMetadata: {},
-deviceListMetadataVersion: 2
-},
-interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-body: proto.Message.InteractiveMessage.Body.create({ text: `${emoji} Resultado de: ` + text }),
-footer: proto.Message.InteractiveMessage.Footer.create({ text: '⪛✰ Tiktok - Busquedas ✰⪜' }),
-header: proto.Message.InteractiveMessage.Header.create({ hasMediaAttachment: false }),
-carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({ cards: [...results] })})}}
-}, { quoted: message })
-await message.react(done)
-await conn.relayMessage(message.chat, responseMessage.message, { messageId: responseMessage.key.id })
-} catch (error) {
-await conn.reply(message.chat, error.toString(), message)
-}}
 
 handler.help = ['tiktoksearch <txt>']
 handler.tags = ['buscador']
