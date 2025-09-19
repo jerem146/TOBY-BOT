@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 const charactersFilePath = './src/database/characters.json';
 const claimMsgFile = './src/database/userClaimConfig.json';
 
-const cooldowns = {};
+export const cooldowns = {};
 
 async function loadCharacters() {
     const data = await fs.readFile(charactersFilePath, 'utf-8');
