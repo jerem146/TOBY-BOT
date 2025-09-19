@@ -1,122 +1,104 @@
 import { readdirSync, statSync, unlinkSync, existsSync, readFileSync, watch, rmSync, promises as fsPromises } from "fs";
-const fs = { ...fsPromises, existsSync };
 import path, { join } from 'path';
 import ws from 'ws';
 
+const fs = { ...fsPromises, existsSync };
 
-let handler = async (m, { conn: _envio, command, usedPrefix, args, text, isOwner }) => {
-  const isDeleteSession = /^(deletesesion|deletebot|deletesession|deletesesaion)$/i.test(command);
-  const isPauseBot = /^(stop|pausarai|pausarbot)$/i.test(command);
-  const isShowBots = /^(bots|sockets|socket)$/i.test(command);
+let handler = async (m, { conn, command, usedPrefix, args, text, isOwner }) => {
+  try {
+    const isCommand1 = /^(deletesesion|deletebot|deletesession|deletesesaion)$/i.test(command);
+    const isCommand2 = /^(stop|pausarai|pausarbot)$/i.test(command);
+    const isCommand3 = /^(bots|sockets|socket)$/i.test(command);
 
-  const reportError = async (e) => {
-    await m.reply(`⚠️ Ocurrió un error inesperado, lo siento mucho...`);
-    console.error(e);
-  };
+    const emoji = '🧠';
+    const emoji2 = '🚫';
+    const emoji3 = '✅';
+    const botname = 'Bot';
+    const jadi = 'jadibots'; // Asegúrate de que esta carpeta exista
+    const msm = '⚠️';
 
-  switch (true) {
-    case isDeleteSession: {
-      const who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender;
-      const uniqid = `${who.split('@')[0]}`;
-      const dirPath = `./${jadi}/${uniqid}`;
+    if (!command) return m.reply(`${msm} Comando no detectado.`);
 
-      if (!await fs.existsSync(dirPath)) {
+    if (isCommand1) {
+      const who = m.mentionedJid?.[0] || (m.fromMe ? conn.user.jid : m.sender);
+      const uniqid = `${who.split`@`[0]}`;
+      const sessionPath = `./${jadi}/${uniqid}`;
+
+      if (!fs.existsSync(sessionPath)) {
         await conn.sendMessage(m.chat, {
-          text: `🚫 *Sesión no encontrada*\n\n✨ No tienes una sesión activa.\n\n🔰 Puedes crear una con:\n*${usedPrefix + command}*\n\n📦 ¿Tienes un ID?\nUsa este comando seguido del ID:\n*${usedPrefix + command}* \`\`\`(ID)\`\`\``
+          text: `${emoji} Usted no tiene una sesión. Puede crear una usando:\n${usedPrefix + command}\n\nSi tiene una ID puede saltarse este paso:\n${usedPrefix + command} (ID)`,
         }, { quoted: m });
         return;
       }
 
       if (global.conn.user.jid !== conn.user.jid) {
         await conn.sendMessage(m.chat, {
-          text: `💬 Este comando solo puede usarse desde el *Bot Principal*.\n\n🔗 Accede desde aquí:\nhttps://api.whatsapp.com/send/?phone=${global.conn.user.jid.split`@`[0]}&text=${usedPrefix + command}&type=phone_number&app_absent=0`
+          text: `${emoji2} Use este comando en el *bot principal*:\nhttps://wa.me/${global.conn.user.jid.split`@`[0]}?text=${usedPrefix + command}`,
         }, { quoted: m });
         return;
       }
 
+      await conn.sendMessage(m.chat, { text: `${emoji} Tu sesión como *Sub-Bot* se ha eliminado` }, { quoted: m });
+
+      try {
+        await fs.rm(sessionPath, { recursive: true, force: true });
+        await conn.sendMessage(m.chat, { text: `${emoji3} Se ha cerrado la sesión y borrado todo rastro.` }, { quoted: m });
+      } catch (e) {
+        console.error("❌ Error al eliminar carpeta:", e);
+        await conn.sendMessage(m.chat, { text: `${msm} Error al eliminar la carpeta.` }, { quoted: m });
+      }
+    }
+
+    // Caso: Pausar bot
+    else if (isCommand2) {
+      if (global.conn.user.jid === conn.user.jid) {
+        await conn.sendMessage(m.chat, { text: `${emoji2} No puedes pausar el *bot principal*.`, quoted: m });
+        return;
+      }
+
+      await conn.sendMessage(m.chat, { text: `${emoji} ${botname} desactivado.`, quoted: m });
+      conn.ws.close();
+    }
+
+    // Caso: Mostrar sub-bots activos
+    else if (isCommand3) {
+      const users = [...new Set([...global.conns.filter(c => c?.user && c.ws?.socket?.readyState !== ws.CLOSED)])];
+
+      const convertirMsADiasHorasMinutosSegundos = (ms) => {
+        let s = Math.floor(ms / 1000) % 60,
+            m = Math.floor(ms / (1000 * 60)) % 60,
+            h = Math.floor(ms / (1000 * 60 * 60)) % 24,
+            d = Math.floor(ms / (1000 * 60 * 60 * 24));
+        return `${d}d ${h}h ${m}m ${s}s`;
+      };
+
+      const message = users.map((v, i) => 
+        `• 「 ${i + 1} 」\n📎 https://wa.me/${v.user.jid.replace(/[^0-9]/g, '')}?text=${usedPrefix}estado\n👤 Usuario: ${v.user.name || 'Sub-Bot'}\n🕑 Online: ${v.uptime ? convertirMsADiasHorasMinutosSegundos(Date.now() - v.uptime) : 'Desconocido'}`
+      ).join('\n\n__________________________\n\n');
+
+      const responseMessage = message.length === 0
+        ? `${emoji2} No hay *sub-bots* activos ahora mismo.`
+        : `${emoji} 𝐋𝐈𝐒𝐓𝐀 𝐃𝐄 𝐋𝐎𝐒 𝐒𝐔𝐁𝐁𝐎𝐓𝐒n\n\n\    n\╭━━━━━━━━━━━━━n\> SI QUIERES UNIR A UNO DE ELLOS A TU GRUPO, ESCRIBELE AL PRIVADO Y DILES QUE SE UNAN COMO BOT.
+╰━━━━━━━━━━━━━n\n\Subbots conectados:\n\n${message}`;
+
       await conn.sendMessage(m.chat, {
-        text: `🗑️ Tu sesión como *Sub-Bot* ha sido eliminada con éxito.`
+        text: responseMessage,
+        mentions: conn.parseMention(responseMessage),
       }, { quoted: m });
-
-      try {
-        fs.rmdir(`./${jadi}/${uniqid}`, { recursive: true, force: true });
-        await conn.sendMessage(m.chat, {
-          text: `🌈 ¡Todo limpio! Tu sesión y sus rastros han sido borrados por completo.`
-        }, { quoted: m });
-      } catch (e) {
-        reportError(e);
-      }
-      break;
     }
 
-    case isPauseBot: {
-      if (global.conn.user.jid == conn.user.jid) {
-        conn.reply(m.chat, `🚫 No puedes pausar el bot principal.\n🛟 Si deseas ser un *Sub-Bot*, contacta con el número principal.`, m);
-      } else {
-        await conn.reply(m.chat, `🔕 *${botname} ha sido pausada.*`, m);
-        conn.ws.close();
-      }
-      break;
+    else {
+      await m.reply(`${msm} Comando no reconocido.`);
     }
 
-    case isShowBots: {
-      try {
-        const allConnections = [...new Set([...global.conns.filter(conn => conn.user && conn.ws.socket && conn.ws.socket.readyState !== ws.CLOSED)])];
-        const cantidadSubBots = allConnections.length;
-
-        const metadata = await _envio.groupMetadata(m.chat);
-        const participantes = metadata.participants || [];
-        const botsEnEsteGrupo = participantes.filter(p => global.db.data.users[p.id]?.isBot).length;
-
-        const convertirMsADiasHorasMinutosSegundos = (ms) => {
-          let segundos = Math.floor(ms / 1000);
-          let minutos = Math.floor(segundos / 60);
-          let horas = Math.floor(minutos / 60);
-          segundos %= 60;
-          minutos %= 60;
-          horas %= 24;
-          return `${horas} horas, ${minutos} minutos, ${segundos} segundos`;
-        };
-
-        const detallesBots = allConnections.map((connBot) => {
-          const numero = connBot.user?.jid?.split('@')[0] || 'Desconocido';
-          const nombre = connBot.user?.name || 'Sub-Bot';
-          const uptime = connBot.uptime ? convertirMsADiasHorasMinutosSegundos(Date.now() - connBot.uptime) : 'Desconocido';
-          return `
-✧ Bot » ${nombre}
-> 🜸 Uptime » ${uptime}`.trim();
-        }).join('\n\n');
-
-        const textoFinal = `
-*ꕥ Números de Sockets Activos*
-
-❀ Principal » *1*
-✿ Subs » *${cantidadSubBots}*
-
-❏ En este grupo » *${botsEnEsteGrupo}* bots
-
-${detallesBots}
-
-> ${dev}`.trim();
-
-        await _envio.sendMessage(m.chat, {
-          text: textoFinal,
-          mentions: [...allConnections.map(v => v.user?.jid), m.sender].filter(Boolean)
-        }, { quoted: m });
-      } catch (e) {
-        reportError(e);
-      }
-      break;
-    }
+  } catch (err) {
+    console.error("❌ Error general en handler:", err);
+    await m.reply('🚨 Ocurrió un error al ejecutar el comando. Revisa la consola.');
   }
 };
 
 handler.tags = ['serbot'];
 handler.help = ['sockets', 'deletesesion', 'pausarai'];
-handler.command = [
-  'deletesesion', 'deletebot', 'deletesession', 'deletesesaion',
-  'stop', 'pausarai', 'pausarbot',
-  'bots', 'sockets', 'socket'
-];
+handler.command = /^(deletesesion|deletebot|deletesession|deletesesaion|stop|pausarai|pausarbot|bots|sockets|socket)$/i;
 
 export default handler;
