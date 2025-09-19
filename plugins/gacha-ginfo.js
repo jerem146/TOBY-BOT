@@ -1,15 +1,13 @@
 import { promises as fs } from 'fs';
 
-import { cooldowns as rwCooldowns } from './rollwaifu.js'; 
+import { cooldowns as rwCooldowns } from './rollwaifu.js';
 import { cooldowns as claimCooldowns } from './claim.js';
 import { cooldowns as voteCooldowns, voteCooldownTime } from './vote.js';
 
 const charactersFilePath = './src/database/characters.json';
 
 function formatTime(ms) {
-    if (ms <= 0) {
-        return 'Ahora.';
-    }
+    if (!ms || ms <= 0) return 'Ahora.';
     const totalSeconds = Math.ceil(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -19,33 +17,39 @@ function formatTime(ms) {
 let handler = async (m, { conn }) => {
     const userId = m.sender;
     const now = Date.now();
-    const userName = await conn.getName(userId);
+    let userName;
 
     try {
+        userName = await conn.getName(userId);
+    } catch {
+        userName = userId;
+    }
 
-        const rwExpiration = rwCooldowns[userId] || 0;
+    try {
+        const rwExpiration = rwCooldowns?.[userId] || 0;
         const rwRemaining = rwExpiration - now;
         const rwStatus = formatTime(rwRemaining);
 
-        const claimExpiration = claimCooldowns[userId] || 0;
+        const claimExpiration = claimCooldowns?.[userId] || 0;
         const claimRemaining = claimExpiration - now;
         const claimStatus = formatTime(claimRemaining);
 
-        const lastVoteTime = voteCooldowns.get(userId);
         let voteStatus = 'Ahora.';
-        if (lastVoteTime) {
-            const voteExpiration = lastVoteTime + voteCooldownTime;
-            const voteRemaining = voteExpiration - now;
-            voteStatus = formatTime(voteRemaining);
+        if (voteCooldowns && typeof voteCooldowns.get === 'function') {
+            const lastVoteTime = voteCooldowns.get(userId);
+            if (lastVoteTime) {
+                const voteExpiration = lastVoteTime + (voteCooldownTime || 0);
+                const voteRemaining = voteExpiration - now;
+                voteStatus = formatTime(voteRemaining);
+            }
         }
 
-        
         let allCharacters = [];
         try {
             const data = await fs.readFile(charactersFilePath, 'utf-8');
             allCharacters = JSON.parse(data);
         } catch (e) {
-            console.error('No se pudo cargar characters.json:', e);
+            console.error('❌ Error leyendo characters.json:', e.message);
             return conn.reply(m.chat, '《✧》Hubo un error al cargar la base de datos de personajes.', m);
         }
 
@@ -56,7 +60,6 @@ let handler = async (m, { conn }) => {
         const totalValue = userCharacters.reduce((sum, char) => {
             return sum + (Number(char.value) || 0);
         }, 0);
-        
 
         let response = `*❀ Usuario \`<${userName}>\`*\n\n`;
         response += `ⴵ RollWaifu » *${rwStatus}*\n`;
@@ -68,7 +71,7 @@ let handler = async (m, { conn }) => {
         await conn.reply(m.chat, response, m);
 
     } catch (e) {
-        console.error(e);
+        console.error('❌ Error en handler ginfo:', e);
         await conn.reply(m.chat, '✘ Ocurrió un error al verificar tu estado.', m);
     }
 };
