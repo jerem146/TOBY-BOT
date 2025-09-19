@@ -22,24 +22,24 @@ let handler = async (m, { conn }) => {
     try {
       name = await conn.getName(userId)
     } catch {
-      name = "Sin Nombre"
+      name = "𖤐 Sin Nombre 𖤐"
     }
 
-    let cumpleanos = user.birth || 'No especificado'
-    let genero = user.genre || 'No especificado'
+    let cumpleanos = user.birth || '𖠿 No especificado'
+    let genero = user.genre || '𖠿 No especificado'
 
     let parejaId = user.marry || null
-    let parejaTag = 'Nadie'
+    let parejaTag = '✘ Nadie'
     let mentions = [userId]
     if (parejaId && global.db.data.users[parejaId]) {
-      parejaTag = `@${parejaId.split('@')[0]}`
+      parejaTag = `⚝ @${parejaId.split('@')[0]}`
       mentions.push(parejaId)
     }
 
-    let description = user.description || 'Sin Descripción'
+    let description = user.description || '˖ ࣪⊹ Ninguna descripción'
     let exp = user.exp || 0
     let nivel = user.level || 0
-    let role = user.role || 'Sin Rango'
+    let role = user.role || '✧ Sin rango'
     let coins = user.coin || 0
     let bankCoins = user.bank || 0
 
@@ -47,22 +47,30 @@ let handler = async (m, { conn }) => {
       .catch(() => 'https://files.catbox.moe/xr2m6u.jpg')
 
     let profileText = `
-「✿」 *Perfil* ◢@${userId.split('@')[0]}◤
-${description}
+﹙𖤍﹚︩︪ ⌗ 𝖯𝖤𝖱𝖥𝖨𝖫 𝖣𝖤 ${name}
 
-✦ Nombre » ${name}
-✦ Edad » ${user.age || 'Desconocida'}
-♛ Cumpleaños » ${cumpleanos}
-⚥ Género » ${genero}
-♡ Casado con » ${parejaTag}
+ㅤㅤ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯  
 
-☆ Experiencia » ${exp.toLocaleString()}
-❖ Nivel » ${nivel}
-✎ Rango » ${role}
+⧉ 𖦹 𝖴𝗌𝖾𝗋 » @${userId.split('@')[0]}
+⧉ 𖦹 𝖣𝖾𝗌𝖼𝗋𝗂𝗉𝗍𝗂𝗈𝗇 » ${description}
 
-⛁ Coins Cartera » ${coins.toLocaleString()} ${moneda}
-⛃ Coins Banco » ${bankCoins.toLocaleString()} ${moneda}
-❁ Premium » ${user.premium ? '✅' : '❌'}
+⧉ 𖦹 𝖠𝗀𝖾 » ${user.age || '𖠿 Desconocida'}
+⧉ 𖦹 𝖢𝗎𝗆𝗉𝗅𝖾 » ${cumpleanos}
+⧉ 𖦹 𝖦énero » ${genero}
+⧉ 𖦹 𝖬𝖺𝗋𝗋𝗒 » ${parejaTag}
+
+ㅤㅤ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯  
+
+⧉ 𖦹 𝖭𝗂𝗏𝖾𝗅 » ${nivel}
+⧉ 𖦹 𝖤𝗑𝗉 » ${exp.toLocaleString()}
+⧉ 𖦹 𝖱𝖺𝗇𝗀𝗈 » ${role}
+
+⧉ 𖦹 𝖢𝗈𝗂𝗇𝗌 » ${coins.toLocaleString()} ${moneda}
+⧉ 𖦹 𝖡𝖺𝗇𝗄 » ${bankCoins.toLocaleString()} ${moneda}
+⧉ 𖦹 𝖯𝗋𝖾𝗆𝗂𝗎𝗆 » ${user.premium ? '✔ Activo' : '✘ Inactivo'}
+
+ㅤㅤ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯  
+⋆｡°✩ 𝖯𝗋𝗈𝗉𝗂𝖾𝗍𝖺𝗋𝗂𝗈 de la bot: ${dev} ⋆｡°✩
 `.trim()
 
     await conn.sendMessage(
@@ -72,8 +80,8 @@ ${description}
         contextInfo: {
           mentionedJid: mentions,
           externalAdReply: {
-            title: '✧ Perfil de Usuario ✧',
-            body: dev,
+            title: '𝘵𝘶 𝘱𝘦𝘳𝘧𝘪𝘭 (*•̀ᴗ•́*)و ̑̑',
+            body: "﹙𖤍﹚ 𝘪𝘯𝘧𝘰𝘳𝘮𝘢𝘤𝘪𝘰 𝘥𝘦𝘭 𝘶𝘴𝘶𝘢𝘳𝘪𝘰.",
             thumbnailUrl: perfil,
             mediaType: 1,
             renderLargerThumbnail: true
