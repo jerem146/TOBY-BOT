@@ -45,60 +45,118 @@ m.exp = 0
 m.coin = false
 try {
 let user = global.db.data.users[m.sender]
-if (!user) {
-    const randomAge = Math.floor(Math.random() * (25 - 15 + 1)) + 15;
-    global.db.data.users[m.sender] = {
-        exp: 0, coin: 100, joincount: 1, diamond: 3, lastadventure: 0, health: 100, lastclaim: 0, lastcofre: 0, lastdiamantes: 0, lastcode: 0, lastduel: 0, lastpago: 0, lastmining: 0, lastcodereg: 0,
-        muto: false, registered: true, genre: '', birth: '', marry: '', description: '', packstickers: null, name: m.name, age: randomAge, regTime: Date.now(), afk: -1, afkReason: '', banned: false, useDocument: false,
-        bank: 0, level: 0, role: 'Nuv', premium: false, premiumTime: 0,
-    }
-} else {
-    if (typeof user !== 'object') global.db.data.users[m.sender] = {}
-    
-    if (user.registered === false || !('registered' in user)) {
-        const randomAge = Math.floor(Math.random() * (25 - 15 + 1)) + 15;
-        user.registered = true
-        user.regTime = Date.now()
-        user.age = user.age > 0 ? user.age : randomAge
-        user.name = m.name
-    }
+if (typeof user !== 'object')
 
-    if (!isNumber(user.exp)) user.exp = 0
-    if (!isNumber(user.coin)) user.coin = 10
-    if (!isNumber(user.joincount)) user.joincount = 1
-    if (!isNumber(user.diamond)) user.diamond = 3
-    if (!isNumber(user.lastadventure)) user.lastadventure = 0
-    if (!isNumber(user.lastclaim)) user.lastclaim = 0
-    if (!isNumber(user.health)) user.health = 100
-    if (!isNumber(user.crime)) user.crime = 0
-    if (!isNumber(user.lastcofre)) user.lastcofre = 0
-    if (!isNumber(user.lastdiamantes)) user.lastdiamantes = 0
-    if (!isNumber(user.lastpago)) user.lastpago = 0
-    if (!isNumber(user.lastcode)) user.lastcode = 0
-    if (!isNumber(user.lastcodereg)) user.lastcodereg = 0
-    if (!isNumber(user.lastduel)) user.lastduel = 0
-    if (!isNumber(user.lastmining)) user.lastmining = 0
-    if (!('muto' in user)) user.muto = false
-    if (!('premium' in user)) user.premium = false
-    if (!user.premium) user.premiumTime = 0
-    if (!('genre' in user)) user.genre = ''
-    if (!('birth' in user)) user.birth = ''
-    if (!('marry' in user)) user.marry = ''
-    if (!('description' in user)) user.description = ''
-    if (!('packstickers' in user)) user.packstickers = null
-    if (!('name' in user)) user.name = m.name
-    if (!isNumber(user.age) || user.age < 1) user.age = -1
-    if (!isNumber(user.regTime)) user.regTime = -1
-    if (!isNumber(user.afk)) user.afk = -1
-    if (!('afkReason' in user)) user.afkReason = ''
-    if (!('role' in user)) user.role = 'Nuv'
-    if (!('banned' in user)) user.banned = false
-    if (!('useDocument' in user)) user.useDocument = false
-    if (!isNumber(user.level)) user.level = 0
-    if (!isNumber(user.bank)) user.bank = 0
-    if (!isNumber(user.warn)) user.warn = 0
+global.db.data.users[m.sender] = {}
+if (user) {
+if (!isNumber(user.exp))
+user.exp = 0
+if (!isNumber(user.coin))
+user.coin = 10
+if (!isNumber(user.joincount))
+user.joincount = 1
+if (!isNumber(user.diamond))
+user.diamond = 3
+if (!isNumber(user.lastadventure))
+user.lastadventure = 0
+if (!isNumber(user.lastclaim))
+user.lastclaim = 0
+if (!isNumber(user.health))
+user.health = 100
+if (!isNumber(user.crime))
+user.crime = 0
+if (!isNumber(user.lastcofre))
+user.lastcofre = 0
+if (!isNumber(user.lastdiamantes))
+user.lastdiamantes = 0
+if (!isNumber(user.lastpago))
+user.lastpago = 0
+if (!isNumber(user.lastcode))
+user.lastcode = 0
+if (!isNumber(user.lastcodereg))
+user.lastcodereg = 0
+if (!isNumber(user.lastduel))
+user.lastduel = 0
+if (!isNumber(user.lastmining))
+user.lastmining = 0
+if (!('muto' in user))
+user.muto = false
+if (!('premium' in user))
+user.premium = false
+if (!user.premium)
+user.premiumTime = 0
+if (!('registered' in user))
+user.registered = false
+if (!('genre' in user))
+user.genre = ''
+if (!('birth' in user))
+user.birth = ''
+if (!('marry' in user))
+user.marry = ''
+if (!('description' in user))
+user.description = ''
+if (!('packstickers' in user))
+user.packstickers = null
+if (!user.registered) {
+if (!('name' in user))
+user.name = m.name
+if (!isNumber(user.age))
+user.age = -1
+if (!isNumber(user.regTime))
+user.regTime = -1
 }
-
+if (!isNumber(user.afk))
+user.afk = -1
+if (!('afkReason' in user))
+user.afkReason = ''
+if (!('role' in user))
+user.role = 'Nuv'
+if (!('banned' in user))
+user.banned = false
+if (!('useDocument' in user))
+user.useDocument = false
+if (!isNumber(user.level))
+user.level = 0
+if (!isNumber(user.bank))
+user.bank = 0
+if (!isNumber(user.warn))
+user.warn = 0
+} else
+                global.db.data.users[m.sender] = {
+exp: 0,
+coin: 10,
+joincount: 1,
+diamond: 3,
+lastadventure: 0,
+health: 100,
+lastclaim: 0,
+lastcofre: 0,
+lastdiamantes: 0,
+lastcode: 0,
+lastduel: 0,
+lastpago: 0,
+lastmining: 0,
+lastcodereg: 0,
+muto: false,
+registered: false,
+genre: '',
+birth: '',
+marry: '',
+description: '',
+packstickers: null,
+name: m.name,
+age: -1,
+regTime: -1,
+afk: -1,
+afkReason: '',
+banned: false,
+useDocument: false,
+bank: 0,
+level: 0,
+role: 'Nuv',
+premium: false,
+premiumTime: 0,                 
+}
 let chat = global.db.data.chats[m.chat]
 if (typeof chat !== 'object')
 global.db.data.chats[m.chat] = {}
@@ -221,18 +279,18 @@ const participants = (m.isGroup ? groupMetadata.participants : []) || []
 const senderNum = normalizeJid(m.sender)
 const botNums = [this.user.jid, this.user.lid].map(j => normalizeJid(cleanJid(j)))
 const user = m.isGroup 
-    ? participants.find(u => normalizeJid(u.id) === senderNum) 
-    : {}
+  ? participants.find(u => normalizeJid(u.id) === senderNum) 
+  : {}
 const bot = m.isGroup 
-    ? participants.find(u => botNums.includes(normalizeJid(u.id))) 
-    : {}
+  ? participants.find(u => botNums.includes(normalizeJid(u.id))) 
+  : {}
 const isRAdmin = user?.admin === 'superadmin' || false
 const isAdmin = isRAdmin || user?.admin === 'admin' || false
 const isBotAdmin = !!bot?.admin
 
 const isROwner = [conn.decodeJid(global.conn.user.id), ...global.owner.map(([number]) => number)]
-    .map(v => v.replace(/[^0-9]/g, ''))
-    .includes(senderNum)
+  .map(v => v.replace(/[^0-9]/g, ''))
+  .includes(senderNum)
 const isOwner = isROwner || m.fromMe
 const isMods = isOwner || global.mods.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum)
 const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum) || _user.premium == true
@@ -322,10 +380,10 @@ let text = _args.join` `
 command = (command || '').toLowerCase()
 let fail = plugin.fail || global.dfail
 let isAccept = plugin.command instanceof RegExp ? 
-                        plugin.command.test(command) :
-                        Array.isArray(plugin.command) ?
-                            plugin.command.some(cmd => cmd instanceof RegExp ? 
-                                cmd.test(command) :
+                    plugin.command.test(command) :
+                    Array.isArray(plugin.command) ?
+                        plugin.command.some(cmd => cmd instanceof RegExp ? 
+                            cmd.test(command) :
 cmd === command) :
 typeof plugin.command === 'string' ? 
 plugin.command === command :
@@ -368,7 +426,7 @@ return
 let hl = _prefix 
 let adminMode = global.db.data.chats[m.chat].modoadmin
 let mini = `${plugins.botAdmin || plugins.admin || plugins.group || plugins || noPrefix || hl ||  m.text.slice(0, 1) == hl || plugins.command}`
-if (adminMode && !isOwner && !isROwner && m.isGroup && !isAdmin && mini) return    
+if (adminMode && !isOwner && !isROwner && m.isGroup && !isAdmin && mini) return   
 if (plugin.rowner && plugin.owner && !(isROwner || isOwner)) { 
 fail('owner', m, this)
 continue
@@ -477,7 +535,7 @@ console.error(e)
 if (opts['queque'] && m.text) {
 const quequeIndex = this.msgqueque.indexOf(m.id || m.key.id)
 if (quequeIndex !== -1)
-                        this.msgqueque.splice(quequeIndex, 1)
+                this.msgqueque.splice(quequeIndex, 1)
 }
 let user, stats = global.db.data.stats
 if (m) { let utente = global.db.data.users[m.sender]
@@ -541,7 +599,7 @@ watchFile(file, async () => {
 unwatchFile(file);
 console.log(chalk.green('Actualizando "handler.js"'));
 
-if (global.conns && global.conns.length > 0) {
+if (global.conns && global.conns.length > 0 ) {
 const users = [...new Set([...global.conns.filter((conn) => conn.user && conn.ws.socket && conn.ws.socket.readyState !== ws.CLOSED).map((conn) => conn)])];
 for (const userr of users) {
 userr.subreloadHandler(false)
