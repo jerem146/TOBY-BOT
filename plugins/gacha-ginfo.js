@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 
-import { cooldowns as rwCooldowns } from './rollwaifu.js';
+import { cooldowns as rwCooldowns } from './gacha-rollwaifu.js';
 import { cooldowns as claimCooldowns } from './claim.js';
 import { cooldowns as voteCooldowns, voteCooldownTime } from './vote.js';
 
