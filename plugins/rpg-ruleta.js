@@ -2,7 +2,7 @@ let cooldowns = {}
 
 let handler = async (m, { conn, text, command, usedPrefix }) => {
   let users = global.db.data.users[m.sender]
-  const tiempoEspera = 10 // segundos
+  const tiempoEspera = 10
 
   if (cooldowns[m.sender] && Date.now() - cooldowns[m.sender] < tiempoEspera * 1000) {
     let tiempoRestante = segundosAHMS(Math.ceil((cooldowns[m.sender] + tiempoEspera * 1000 - Date.now()) / 1000))
@@ -40,11 +40,10 @@ let handler = async (m, { conn, text, command, usedPrefix }) => {
   setTimeout(() => {
     const resultado = Math.random() < 0.50 ? color : (color === 'red' ? 'black' : 'red')
     const hasGanado = resultado === color
-    const ganancia = Math.floor(coin * 2.5)
 
     if (hasGanado) {
-      users.coin += ganancia
-      conn.reply(m.chat, `「✿」La ruleta salió en *${resultado}* 🎉\n> ¡Ganaste *¥${ganancia.toLocaleString()} ${moneda}*!`, m)
+      users.coin += coin * 2
+      conn.reply(m.chat, `「✿」La ruleta salió en *${resultado}* 🎉\n> ¡Ganaste *¥${coin.toLocaleString()} ${moneda}*! Tu apuesta fue devuelta también.`, m)
     } else {
       users.coin -= coin
       conn.reply(m.chat, `「✿」La ruleta salió en *${resultado}* 😿\n> Perdiste *¥${coin.toLocaleString()} ${moneda}*. ¡Suerte para la próxima!`, m)
