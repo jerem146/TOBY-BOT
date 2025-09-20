@@ -1,45 +1,46 @@
-import ws from 'ws'
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+    const chat = global.db.data.chats[m.chat] || (global.db.data.chats[m.chat] = {});
 
-function normalizeJid(jid) {
-  if (!jid) return null
-  jid = String(jid).toLowerCase()
-  jid = jid.replace(/:\d+@/, '@')
-  return jid
-}
+    const resetWords = ['reset', 'resetbot', 'resetprimario', 'botreset'];
+    const firstWord = (text || '').trim().split(/\s+/)[0]?.replace(/^[^a-z0-9]+/i, '').toLowerCase();
 
-const handler = async (m, { conn, usedPrefix }) => {
-  const subBots = [...new Set([...global.conns.filter(
-    (conn) => conn.user && conn.ws.socket && conn.ws.socket.readyState !== ws.CLOSED
-  ).map((conn) => normalizeJid(conn.user.jid))])]
+    if (resetWords.includes(firstWord)) {
+        if (!chat.botPrimario) return m.reply('《✧》 No hay ningún bot primario en este grupo.');
+        chat.botPrimario = null;
+        if (global.db?.write) await global.db.write();
+        return m.reply('✐ Se restableció la configuración. Ahora todos los bots responderán nuevamente en este grupo.');
+    }
 
-  if (global.conn?.user?.jid && !subBots.includes(normalizeJid(global.conn.user.jid))) {
-    subBots.push(normalizeJid(global.conn.user.jid))
-  }
+    if (chat.botPrimario) {
+        const normalizeJid = jid => jid?.toLowerCase().replace(/:\d+@/, '@');
+        const connJid = normalizeJid(conn?.user?.id || conn?.user?.jid);
+        const primaryJid = normalizeJid(chat.botPrimario);
 
-  const chat = global.db.data.chats[m.chat]
-  const mentionedJid = await m.mentionedJid
-  const who = mentionedJid[0] ? mentionedJid[0] : m.quoted ? await m.quoted.sender : false
-  if (!who) return conn.reply(m.chat, `❀ Por favor, menciona a un Socket para hacerlo Bot principal del grupo.`, m)
+        if (primaryJid && connJid !== primaryJid) {
+            return;
+        }
+    }
 
-  const whoNorm = normalizeJid(who)
-  if (!subBots.includes(whoNorm)) return conn.reply(m.chat, `ꕥ El usuario mencionado no es un Socket de: *${botname}*.`, m)
+    if (!m.mentionedJid || m.mentionedJid.length === 0) {
+        return m.reply(`《✧》 Debes mencionar a un usuario/bot para establecerlo como primario.\nEj: ${usedPrefix + command} @tag`);
+    }
 
-  if (chat.primaryBot === whoNorm) {
-    return conn.reply(m.chat, `ꕥ @${whoNorm.split`@`[0]} ya está como Bot primario en este grupo.`, m, { mentions: [who] })
-  }
+    const raw = m.mentionedJid[0];
+    const normalized = raw.toLowerCase().replace(/:\d+@/, '@');
 
-  try {
-    chat.primaryBot = whoNorm
-    conn.reply(m.chat, `❀ Se ha establecido a @${whoNorm.split`@`[0]} como Bot primario de este grupo.\n> Ahora todos los comandos de este grupo serán ejecutados por @${whoNorm.split`@`[0]}.`, m, { mentions: [who] })
-  } catch (e) {
-    conn.reply(m.chat, `⚠︎ Se ha producido un problema.\n> Usa *${usedPrefix}report* para informarlo.\n\n${e.message}`, m)
-  }
-}
+    chat.botPrimario = normalized;
+    if (global.db?.write) await global.db.write();
 
-handler.help = ['setprimary']
-handler.tags = ['grupo']
-handler.command = ['setprimary']
-handler.group = true
-handler.admin = true
+    await conn.sendMessage(m.chat, {
+        text: `✐ Se estableció como primario a *@${normalized.split('@')[0]}*`,
+        mentions: [normalized]
+    }, { quoted: m });
+};
 
-export default handler
+handler.help = ['setprimary @user', 'resetbot'];
+handler.tags = ['grupo'];
+handler.command = ['setprimary', 'botprimario', 'setbot'];
+handler.group = true;
+handler.admin = true;
+
+export default handler;
