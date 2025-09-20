@@ -14,11 +14,16 @@ function formatTime(ms) {
     const days = Math.floor(totalMinutes / 1440)
     const hours = Math.floor((totalMinutes % 1440) / 60)
     const minutes = totalMinutes % 60
-    let result = ''
-    if (days) result += `${days}d `
-    if (hours) result += `${hours}h `
-    if (minutes || (!days && !hours)) result += `${minutes}m`
-    return result.trim()
+    let result = []
+    if (days) result.push(`${days}d`)
+    if (hours) result.push(`${hours}h`)
+    if (minutes || (!days && !hours)) result.push(`${minutes}m`)
+    return result.join(' ')
+}
+
+function formatDate(timestamp) {
+    const d = new Date(timestamp)
+    return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 const handler = async (m, { conn, args }) => {
@@ -28,8 +33,8 @@ const handler = async (m, { conn, args }) => {
     for (let user in marriages) {
         if (!procesados.has(user)) {
             const partner = marriages[user]?.partner || marriages[user]
-            const date = marriages[user]?.date || marriages[partner]?.date || Date.now()
-            if (partner && !procesados.has(partner)) {
+            const date = marriages[user]?.date || marriages[partner]?.date
+            if (partner && !procesados.has(partner) && date) {
                 parejas.push({ user, partner, date })
                 procesados.add(user)
                 procesados.add(partner)
@@ -37,12 +42,9 @@ const handler = async (m, { conn, args }) => {
         }
     }
 
-    // Ordenamos de más tiempo casados a menos
     parejas.sort((a, b) => a.date - b.date)
 
-    // Top decorado
     const iconos = ['👑', '🥈', '🥉']
-
     let page = args[0] && !isNaN(args[0]) ? parseInt(args[0]) : 1
     const perPage = 10
     const start = (page - 1) * perPage
@@ -54,10 +56,11 @@ const handler = async (m, { conn, args }) => {
     for (let i = start; i < Math.min(end, parejas.length); i++) {
         const p = parejas[i]
         const tiempo = formatTime(Date.now() - p.date)
+        const fecha = formatDate(p.date)
         const nombreUser = await conn.getName(p.user)
         const nombrePartner = await conn.getName(p.partner)
         const icono = iconos[i] || '✰'
-        texto += `${icono} ${i + 1} » *${nombreUser} ❤️ ${nombrePartner}:*\n\t Total→ *${tiempo} casados*\n`
+        texto += `${icono} ${i + 1} » *${nombreUser}* ｜ *${nombrePartner}*\n\t Tiempo casados → *${tiempo}*\n\t Fecha matrimonio → *${fecha}*\n`
     }
 
     texto += `\n> • Página *${page}* de *${totalPages}*`
@@ -67,7 +70,7 @@ const handler = async (m, { conn, args }) => {
 
 handler.help = ['topmarried']
 handler.tags = ['fun']
-handler.command = ['topmarried', 'tpm']
+handler.command = ['topparejas', 'topmarry']
 handler.group = true
 
 export default handler
