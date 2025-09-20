@@ -1,6 +1,6 @@
-/* Código hecho por Destroy
+/* Código hecho por Destroy, adaptado por ChatGPT
  - https://github.com/The-King-Destroy
- - Dejen créditos aunque sea gracias.
+ - Créditos respetados.
 */
 
 import fs from 'fs';
@@ -32,13 +32,13 @@ const handler = async (m, { conn, command }) => {
 
             if (!proposee) {
                 if (userIsMarried(proposer)) {
-                    return await conn.reply(m.chat, `《✧》 Ya estás casado con *${conn.getName(marriages[proposer])}*\n> Puedes divorciarte con el comando: *#divorce*`, m);
+                    return await conn.reply(m.chat, `《✧》 Ya estás casado con *${conn.getName(marriages[proposer].partner)}*\n> Puedes divorciarte con el comando: *#divorce*`, m);
                 } else {
-                    throw new Error('Debes mencionar a alguien para aceptar o proponer matrimonio.\n> Ejemplo » *#marry @⁨Ruby Hoshino⁩*');
+                    throw new Error('Debes mencionar a alguien para aceptar o proponer matrimonio.\n> Ejemplo » *#marry @Usuario*');
                 }
             }
-            if (userIsMarried(proposer)) throw new Error(`Ya estás casado con ${conn.getName(marriages[proposer])}.`);
-            if (userIsMarried(proposee)) throw new Error(`${conn.getName(proposee)} ya está casado con ${conn.getName(marriages[proposee])}.`);
+            if (userIsMarried(proposer)) throw new Error(`Ya estás casado con ${conn.getName(marriages[proposer].partner)}.`);
+            if (userIsMarried(proposee)) throw new Error(`${conn.getName(proposee)} ya está casado con ${conn.getName(marriages[proposee].partner)}.`);
             if (proposer === proposee) throw new Error('¡No puedes proponerte matrimonio a ti mismo!');
 
             proposals[proposer] = proposee;
@@ -58,12 +58,11 @@ const handler = async (m, { conn, command }) => {
         } else if (isDivorce) {
             if (!userIsMarried(m.sender)) throw new Error('No estás casado con nadie.');
 
-            const partner = marriages[m.sender];
+            const partner = marriages[m.sender].partner;
             delete marriages[m.sender];
             delete marriages[partner];
             saveMarriages();
 
-            // 👉 Actualizamos también la base de datos de usuarios
             if (global.db.data.users[m.sender]) global.db.data.users[m.sender].marry = '';
             if (global.db.data.users[partner]) global.db.data.users[partner].marry = '';
 
@@ -89,11 +88,13 @@ handler.before = async (m) => {
 
     if (/^Si$/i.test(m.text)) {
         delete proposals[proposer];
-        marriages[proposer] = m.sender;
-        marriages[m.sender] = proposer;
+
+        const fecha = Date.now();
+
+        marriages[proposer] = { partner: m.sender, date: fecha };
+        marriages[m.sender] = { partner: proposer, date: fecha };
         saveMarriages();
 
-        // 👉 Actualizamos también la base de datos de usuarios
         if (global.db.data.users[proposer]) global.db.data.users[proposer].marry = m.sender;
         if (global.db.data.users[m.sender]) global.db.data.users[m.sender].marry = proposer;
 
