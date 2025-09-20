@@ -21,7 +21,7 @@ function formatTime(ms) {
     return result.trim()
 }
 
-const handler = async (m, { conn }) => {
+const handler = async (m, { conn, args }) => {
     let parejas = []
     const procesados = new Set()
 
@@ -37,24 +37,37 @@ const handler = async (m, { conn }) => {
         }
     }
 
+    // Ordenamos de más tiempo casados a menos
     parejas.sort((a, b) => a.date - b.date)
+
+    // Top decorado
+    const iconos = ['👑', '🥈', '🥉']
+
+    let page = args[0] && !isNaN(args[0]) ? parseInt(args[0]) : 1
+    const perPage = 10
+    const start = (page - 1) * perPage
+    const end = start + perPage
+    const totalPages = Math.ceil(parejas.length / perPage)
 
     let texto = `「✿」Top parejas casadas por tiempo de matrimonio:\n\n`
 
-    for (let i = 0; i < parejas.length; i++) {
+    for (let i = start; i < Math.min(end, parejas.length); i++) {
         const p = parejas[i]
         const tiempo = formatTime(Date.now() - p.date)
         const nombreUser = await conn.getName(p.user)
         const nombrePartner = await conn.getName(p.partner)
-        texto += `${i + 1}. ${nombreUser} ❤️ ${nombrePartner} → *${tiempo} casados*\n`
+        const icono = iconos[i] || '✰'
+        texto += `${icono} ${i + 1} » *${nombreUser} ❤️ ${nombrePartner}:*\n\t Total→ *${tiempo} casados*\n`
     }
+
+    texto += `\n> • Página *${page}* de *${totalPages}*`
 
     await conn.reply(m.chat, texto.trim(), m)
 }
 
 handler.help = ['topmarried']
 handler.tags = ['fun']
-handler.command = ['topmarry', 'topparejas']
+handler.command = ['topmarried', 'tpm']
 handler.group = true
 
 export default handler
