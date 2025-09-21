@@ -8,6 +8,18 @@ import chalk from 'chalk'
 import failureHandler from './lib/respuesta.js';
 import fetch from 'node-fetch'
 
+const chatDB = global.db.data.chats[m.chat];
+if (chatDB && chatDB.botPrimario) {
+    const universalWords = ['resetbot', 'resetprimario', 'botreset'];
+    const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
+
+    if (!universalWords.includes(firstWord)) {
+        if (chatDB.botPrimario !== this.user.jid) {
+            return;
+        }
+    }
+}
+
 const { proto } = (await import('@whiskeysockets/baileys')).default
 const isNumber = x => typeof x === 'number' && !isNaN(x)
 const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function () {
