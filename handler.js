@@ -8,18 +8,6 @@ import chalk from 'chalk'
 import failureHandler from './lib/respuesta.js';
 import fetch from 'node-fetch'
 
-const chatDB = global.db.data.chats[m.chat];
-if (chatDB && chatDB.botPrimario) {
-    const universalWords = ['resetbot', 'resetprimario', 'botreset'];
-    const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
-
-    if (!universalWords.includes(firstWord)) {
-        if (chatDB.botPrimario !== this.user.jid) {
-            return;
-        }
-    }
-}
-
 const { proto } = (await import('@whiskeysockets/baileys')).default
 const isNumber = x => typeof x === 'number' && !isNaN(x)
 const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function () {
@@ -42,6 +30,18 @@ try {
 m = smsg(this, m) || m
 if (!m)
 return
+
+const chatDB = global.db.data.chats[m.chat];
+if (chatDB && chatDB.botPrimario) {
+const universalWords = ['resetbot', 'resetprimario', 'botreset'];
+const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
+
+if (!universalWords.includes(firstWord)) {
+if (chatDB.botPrimario !== this.user.jid) {
+return;
+}
+}
+}
 
 const sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid
 
@@ -300,9 +300,9 @@ global.comando = command
 if ((m.id.startsWith('NJX-') || (m.id.startsWith('BAE5') && m.id.length === 16) || (m.id.startsWith('B24E') && m.id.length === 20))) return
 if (!isAccept) { continue }
 m.plugin = name
-if (m.chat in global.db.data.chats || sender in global.db.data.users) { // Usamos sender
+if (m.chat in global.db.data.chats || sender in global.db.data.users) {
 let chat = global.db.data.chats[m.chat]
-let user = global.db.data.users[sender] // Usamos sender
+let user = global.db.data.users[sender]
 if (!['grupo-unbanchat.js'].includes(name) && chat && chat.isBanned && !isROwner) return
 if (name != 'grupo-unbanchat.js' && name != 'owner-exec.js' && name != 'owner-exec2.js' && name != 'grupo-delete.js' && chat?.isBanned && !isROwner) return
 if (user.antispam > 2) return
@@ -312,9 +312,9 @@ user.antispam++
 return
 }
 if (user.antispam2 && isROwner) return
-if (m.chat in global.db.data.chats || sender in global.db.data.users) { // Usamos sender
+if (m.chat in global.db.data.chats || sender in global.db.data.users) {
 let chat = global.db.data.chats[m.chat]
-let user = global.db.data.users[sender] // Usamos sender
+let user = global.db.data.users[sender]
 let setting = global.db.data.settings[this.user.jid]
 if (name != 'grupo-unbanchat.js' && chat?.isBanned) return
 if (name != 'owner-unbanuser.js' && user?.banned) return
@@ -364,7 +364,7 @@ m.isCommand = true
 let xp = 'exp' in plugin ? parseInt(plugin.exp) : 17
 if (xp > 200) m.reply('chirrido -_-')
 else m.exp += xp
-if (!isPrems && plugin.coin && global.db.data.users[sender].coin < plugin.coin * 1) { // Usamos sender
+if (!isPrems && plugin.coin && global.db.data.users[sender].coin < plugin.coin * 1) {
 this.reply(m.chat, `❮✦❯ Se agotaron tus ${moneda}`, m)
 continue
 }
@@ -406,13 +406,13 @@ const quequeIndex = this.msgqueque.indexOf(m.id || m.key.id)
 if (quequeIndex !== -1) this.msgqueque.splice(quequeIndex, 1)
 }
 let user, stats = global.db.data.stats
-if (m) { let utente = global.db.data.users[sender] // Usamos sender
-if (utente && utente.muto == true) { // Añadimos una comprobación por si utente es undefined
+if (m) { let utente = global.db.data.users[sender]
+if (utente && utente.muto == true) {
 let bang = m.key.id
 let cancellazzione = m.key.participant
 await this.sendMessage(m.chat, { delete: { remoteJid: m.chat, fromMe: false, id: bang, participant: cancellazzione }})
 }
-if (sender && (user = global.db.data.users[sender])) { // Usamos sender
+if (sender && (user = global.db.data.users[sender])) {
 user.exp += m.exp
 user.coin -= m.coin * 1
 }
