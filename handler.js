@@ -26,6 +26,7 @@ if (!m)
 return;
 if (global.db.data == null)
 await global.loadDatabase()
+let sender;
 try {
 m = smsg(this, m) || m
 if (!m)
@@ -43,7 +44,7 @@ return;
 }
 }
 
-const sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid
+sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid; // 2. ASIGNAMOS EL VALOR A 'sender' (sin const)
 
 m.exp = 0
 m.coin = false
