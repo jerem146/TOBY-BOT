@@ -44,7 +44,7 @@ return;
 }
 }
 
-sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid; // 2. ASIGNAMOS EL VALOR A 'sender' (sin const)
+sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid;
 
 m.exp = 0
 m.coin = false
