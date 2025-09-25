@@ -11,38 +11,26 @@ import fetch from 'node-fetch'
 const { proto } = (await import('@whiskeysockets/baileys')).default
 const isNumber = x => typeof x === 'number' && !isNaN(x)
 const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function () {
-  clearTimeout(this)
-  resolve()
+clearTimeout(this)
+resolve()
 }, ms))
 
-const processedMessageIds = new Set();
-function alreadyProcessed(id) {
-  if (!id) return false
-  if (processedMessageIds.has(id)) return true;
-  processedMessageIds.add(id);
-  setTimeout(() => processedMessageIds.delete(id), 60000);
-  return false;
-}
-
 export async function handler(chatUpdate) {
-  this.msgqueque = this.msgqueque || []
-  this.uptime = this.uptime || Date.now()
-  if (!chatUpdate)
-    return
-  this.pushMessage(chatUpdate.messages).catch(console.error)
-  let m = chatUpdate.messages[chatUpdate.messages.length - 1]
-  if (!m)
-    return;
-
-  if (alreadyProcessed(m.key?.id)) return;
-
-  if (global.db.data == null)
-    await global.loadDatabase()
-  let sender;
-  try {
-    m = smsg(this, m) || m
-    if (!m)
-      return
+this.msgqueque = this.msgqueque || []
+this.uptime = this.uptime || Date.now()
+if (!chatUpdate)
+return
+this.pushMessage(chatUpdate.messages).catch(console.error)
+let m = chatUpdate.messages[chatUpdate.messages.length - 1]
+if (!m)
+return;
+if (global.db.data == null)
+await global.loadDatabase()
+let sender;
+try {
+m = smsg(this, m) || m
+if (!m)
+return
 
 const chatDB = global.db.data.chats[m.chat];
 if (chatDB && chatDB.botPrimario) {
