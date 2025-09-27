@@ -76,6 +76,15 @@ const handler = async (m, { conn, usedPrefix, command, args, isOwner, isAdmin, i
       chat.autolevelup = isEnable;
       break;
 
+case 'audios':
+if (m.isGroup) {
+if (!(isAdmin || isOwner)) {
+global.dfail('admin', m, conn)
+throw false
+}}
+chat.audios = isEnable          
+break
+
     case 'autosticker':
       if (m.isGroup) {
         if (!(isAdmin || isOwner)) {
