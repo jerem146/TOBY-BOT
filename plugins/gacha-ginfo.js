@@ -78,7 +78,7 @@ let handler = async (m, { conn }) => {
 
 handler.help = ['estado', 'status', 'cooldowns', 'cd'];
 handler.tags = ['info'];
-handler.command = ['ginfo'];
+handler.command = ['infogacha', 'ginfo', 'gachainfo'];
 handler.group = true;
 handler.register = true;
 
