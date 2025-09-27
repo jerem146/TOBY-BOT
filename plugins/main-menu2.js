@@ -172,7 +172,7 @@ const handler = async (m, {conn, usedPrefix, usedPrefix: _p, __dirname, text, is
 };
 handler.tags = ['main']
 handler.help = ['menu2']
-handler.command = /^(menu2|menuaudios)$/i;
+handler.command = ['menuaudios','menu2'];
 handler.register = true
 handler.exp = 50;
 handler.fail = null;
