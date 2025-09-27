@@ -176,6 +176,7 @@ if (!('autosticker' in chat)) chat.autosticker = false
 if (!('autoRechazar' in chat)) chat.autoRechazar = false
 if (!('autoresponder' in chat)) chat.autoresponder = false
 if (!('detect' in chat)) chat.detect = true
+if (!('audios' in chat)) chat.audios = false               
 if (!('antiBot' in chat)) chat.antiBot = false
 if (!('antiBot2' in chat)) chat.antiBot2 = false
 if (!('modoadmin' in chat)) chat.modoadmin = false
@@ -194,6 +195,7 @@ sAutoresponder: '', welcome: true, isBanned: false, autolevelup: false, autoresp
 antiBot2: false, modoadmin: false, antiLink: true, antifake: false, antiArabe: false, reaction: false, nsfw: false, expired: 0,
 welcomeText: null,
 byeText: null,
+audios: false,
 botPrimario: null,
 }
 var settings = global.db.data.settings[this.user.jid]
