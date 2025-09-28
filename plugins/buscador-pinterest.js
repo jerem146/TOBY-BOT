@@ -1,31 +1,40 @@
-/*
-• Felix Manuel 
-- Créditos a quien lo merece ~
-🌸 Adaptado y embellecido para Ruby Hoshino por Dioneibi-rip
-*/
-
-import fetch from 'node-fetch';
+import axios from 'axios';
 import baileys from '@whiskeysockets/baileys';
 
-const newsletterJid = '120363335626706839@newsletter';
-const newsletterName = '⏤͟͞ू⃪፝͜⁞⟡『 𝐑𝐮𝐛𝐲 𝐇𝐨𝐬𝐡𝐢𝐧𝐨 𝐂𝐡𝐚𝐧𝐧𝐞𝐥 』࿐⟡';
-const wm = '🌸 Ruby-Hoshino Bot — powered by Dioneibi-rip';
-const icons = 'https://i.imgur.com/Xs41WOr.jpg';
-const channel = 'https://github.com/Dioneibi-rip/Ruby-Hoshino-Bot';
-
 async function sendAlbumMessage(jid, medias, options = {}) {
-  if (typeof jid !== "string") throw new TypeError(`jid must be string, received: ${jid}`);
-  if (medias.length < 2) throw new RangeError("Se necesitan al menos 2 imágenes para un álbum");
+  if (typeof jid !== "string") throw new TypeError(`⚠️ El JID debe ser un texto válido.`);
+  if (medias.length < 2) throw new RangeError("⚠️ Se requieren al menos dos imágenes para crear un álbum.");
+
+  for (const media of medias) {
+    if (!['image', 'video'].includes(media.type))
+      throw new TypeError(`❌ Tipo inválido: ${media.type}`);
+    if (!media.data || (!media.data.url && !Buffer.isBuffer(media.data)))
+      throw new TypeError(`⚠️ Los datos de la imagen o video no son válidos.`);
+  }
 
   const caption = options.text || options.caption || "";
   const delay = !isNaN(options.delay) ? options.delay : 500;
-  delete options.text;
-  delete options.caption;
-  delete options.delay;
 
   const album = baileys.generateWAMessageFromContent(
     jid,
-    { messageContextInfo: {}, albumMessage: { expectedImageCount: medias.length } },
+    {
+      messageContextInfo: {},
+      albumMessage: {
+        expectedImageCount: medias.filter(m => m.type === "image").length,
+        expectedVideoCount: medias.filter(m => m.type === "video").length,
+        ...(options.quoted
+          ? {
+              contextInfo: {
+                remoteJid: options.quoted.key.remoteJid,
+                fromMe: options.quoted.key.fromMe,
+                stanzaId: options.quoted.key.id,
+                participant: options.quoted.key.participant || options.quoted.key.remoteJid,
+                quotedMessage: options.quoted.message,
+              },
+            }
+          : {}),
+      },
+    },
     {}
   );
 
@@ -39,78 +48,78 @@ async function sendAlbumMessage(jid, medias, options = {}) {
       { upload: conn.waUploadToServer }
     );
     img.message.messageContextInfo = {
-      forwardingScore: 999,
-      isForwarded: true,
-      forwardedNewsletterMessageInfo: {
-        newsletterJid,
-        newsletterName,
-        serverMessageId: -1
-      }
+      messageAssociation: { associationType: 1, parentMessageKey: album.key },
     };
     await conn.relayMessage(img.key.remoteJid, img.message, { messageId: img.key.id });
     await baileys.delay(delay);
   }
+
   return album;
 }
 
-const handler = async (m, { conn, text, usedPrefix, command }) => {
-  const name = conn.getName(m.sender);
-
-  if (!text) {
-    return conn.reply(m.chat,
-      `🌸 *Onii-chan... nani sagashitai no?* (✿◕‿◕)\n\n` +
-      `💡 Uso correcto:\n\`${usedPrefix + command} Shinobu aesthetic\``, m);
-  }
-
-  await m.react('🔍');
-  conn.reply(m.chat, '⏳ *Buscando imágenes súper kawaii para ti, onii-chan... espera un momentito~* 💕', m, {
-    contextInfo: {
-      mentionedJid: [m.sender],
-      forwardingScore: 999,
-      isForwarded: true,
-      forwardedNewsletterMessageInfo: {
-        newsletterJid,
-        newsletterName,
-        serverMessageId: -1
-      },
-      externalAdReply: {
-        title: packname,
-        body: wm,
-        thumbnail: icons,
-        sourceUrl: channel,
-        mediaType: 1,
-        renderLargerThumbnail: true
-      }
-    }
-  });
-
+const pins = async (query) => {
   try {
-    const res = await fetch(`https://api.dorratz.com/v2/pinterest?q=${encodeURIComponent(text)}`);
-    const data = await res.json();
-
-    if (!Array.isArray(data) || data.length < 2) {
-      return conn.reply(m.chat, '💦 *Gomen... No encontré suficientes imágenes para mostrarte un álbum bonito, onii-chan~*', m);
+    const res = await axios.get(`https://anime-xi-wheat.vercel.app/api/pinterest?q=${encodeURIComponent(query)}`);
+    if (Array.isArray(res.data.images)) {
+      return res.data.images.map(url => ({
+        image_large_url: url,
+        image_medium_url: url,
+        image_small_url: url
+      }));
     }
-
-    const images = data.slice(0, 10).map(img => ({
-      type: "image",
-      data: { url: img.image_large_url }
-    }));
-
-    const caption = `🌸 *Imágenes encontradas para:* 『 ${text} 』\n🖼️ Aquí tienes tu álbum mágico, ${name}-chan~`;
-
-    await sendAlbumMessage(m.chat, images, { caption, quoted: m });
-    await m.react('✨');
-
-  } catch (error) {
-    console.error(error);
-    await m.react('❌');
-    conn.reply(m.chat, '😿 *Shimatta... ocurrió un error mientras buscaba en Pinterest, onii-chan.*', m);
+    return [];
+  } catch (err) {
+    console.error('💥 Error al obtener resultados de Pinterest:', err);
+    return [];
   }
 };
 
-handler.help = ['pinterest']
-handler.command = ['pinterest', 'pin']
-handler.tags = ['dl']
+let handler = async (m, { conn, text }) => {
+  const dev = 'Dioneibi';
+  const botname = 'Ruby-Bot ✨';
 
-export default handler
+  if (!text) {
+    return conn.reply(
+      m.chat,
+      `📌 *Uso correcto:*\nEscribe el término que deseas buscar.\n\n✨ *Ejemplo:* .pinterest anime girl`,
+      m
+    );
+  }
+
+  try {
+    await m.react('🔍');
+    const results = await pins(text);
+    if (!results.length)
+      return conn.reply(m.chat, `❌ No se encontraron resultados para *${text}*. Intenta con otro término.`, m);
+
+    const max = Math.min(results.length, 15);
+    const medias = [];
+
+    for (let i = 0; i < max; i++) {
+      medias.push({
+        type: 'image',
+        data: {
+          url: results[i].image_large_url || results[i].image_medium_url || results[i].image_small_url
+        }
+      });
+    }
+
+    await sendAlbumMessage(m.chat, medias, {
+      caption: `🌸 Ruby-Chan te trae los resultados:\n\n📌 *Búsqueda:* ${text}\n🖼️ *Resultados:* ${max}\n👤 *Creador:* ${dev}`,
+      quoted: m
+    });
+
+    await conn.sendMessage(m.chat, { react: { text: '🌺', key: m.key } });
+
+  } catch (e) {
+    console.error(e);
+    return conn.reply(m.chat, '⚠️ Ocurrió un error al procesar la búsqueda en Pinterest.', m);
+  }
+};
+
+handler.help = ['pinterest'];
+handler.command = ['pinterest', 'pin'];
+handler.tags = ['buscador'];
+handler.register = true;
+
+export default handler;
