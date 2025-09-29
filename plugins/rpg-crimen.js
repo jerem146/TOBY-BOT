@@ -22,7 +22,7 @@ const handler = async (m, { conn }) => {
 
     const outcome = Math.random();
     const jailChance = 0.15 * premiumBenefit;
-    const successChance = 0.75;
+    const successChance = 0.70;
 
     if (outcome < jailChance) {
         jail[senderId] = Date.now() + jailCooldown;
