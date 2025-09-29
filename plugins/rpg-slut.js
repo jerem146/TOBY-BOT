@@ -15,7 +15,7 @@ const handler = async (m, { conn }) => {
         return m.reply(`🥵 Necesitas recuperar el aliento. Vuelve en *${remaining}*.`);
     }
 
-    const winChance = 0.65;
+    const winChance = 0.75;
     const didWin = Math.random() < winChance;
 
     let userIds = Object.keys(users).filter(u => u !== senderId && !users[u].banned);
