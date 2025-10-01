@@ -11,7 +11,7 @@ let staff = `ᥫ᭡ *EQUIPO DE AYUDANTES* ❀
 ✦ *Rol* » Ayudante y desarrollador. 
 > ✧ Github » https://github.com/nevi-dev
 
-✰ *Colaborador 2* » LegnaXjs
+✰ *Colaborador 2* » Legna
 ✦ *Rol* » Soporte/ayudante, editor.
 > ✧ Github » https://github.com/Legna-chan
 `
