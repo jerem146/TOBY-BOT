@@ -176,7 +176,7 @@ if (!('autosticker' in chat)) chat.autosticker = false
 if (!('autoRechazar' in chat)) chat.autoRechazar = false
 if (!('autoresponder' in chat)) chat.autoresponder = false
 if (!('detect' in chat)) chat.detect = true
-if (!('audios' in chat)) chat.audios = false               
+if (!('audios' in chat)) chat.audios = false
 if (!('antiBot' in chat)) chat.antiBot = false
 if (!('antiBot2' in chat)) chat.antiBot2 = false
 if (!('modoadmin' in chat)) chat.modoadmin = false
@@ -288,6 +288,10 @@ continue
 }
 if (typeof plugin !== 'function') continue
 if ((usedPrefix = (match[0] || '')[0])) {
+if (m.key) {
+await this.readMessages([m.key]);
+}
+
 let noPrefix = m.text.replace(usedPrefix, '')
 let [command, ...args] = noPrefix.trim().split` `.filter(v => v)
 args = args || []
@@ -442,7 +446,7 @@ try {
 if (!opts['noprint']) await (await import(`./lib/print.js`)).default(m, this)
 } catch (e) { console.log(m, m.quoted, e) }
 let settingsREAD = global.db.data.settings[this.user.jid] || {}
-if (opts['autoread']) await this.readMessages([m.key])
+if (settingsREAD.autoread) await this.readMessages([m.key])
 if (global.db.data.chats[m.chat]?.reaction && m.text.match(/(ción|dad|aje|oso|izar|mente|pero|tion|age|ous|ate|and|but|ify|ai|yuki|a|s)/gi)) {
 const pickRandom = (list) => list[Math.floor(Math.random() * list.length)]
 let emot = pickRandom(["🍟", "😃", "😄", "😁", "😆", "🍓", "😅", "😂", "🤣", "🥲", "☺️", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "🌺", "🌸", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🌟", "🤓", "😎", "🥸", "🤩", "🥳", "😏", "💫", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😶‍🌫️", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🫣", "🤭", "🤖", "🍭", "🤫", "🫠", "🤥", "😶", "📇", "😐", "💧", "😑", "🫨", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😮‍💨", "😵", "😵‍💫", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👺", "🧿", "🌩", "👻", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾", "🫶", "👍", "✌️", "🙏", "🫵", "🤏", "🤌", "☝️", "🖕", "🙏", "🫵", "🫂", "🐱", "🤹‍♀️", "🤹‍♂️", "🗿", "✨", "⚡", "🔥", "🌈", "🩷", "❤️", "🧡", "💛", "💚", "🩵", "💙", "💜", "🖤", "🩶", "🤍", "🤎", "💔", "❤️‍🔥", "❤️‍🩹", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "🚩", "👊", "⚡️", "💋", "🫰", "💅", "👑", "🐣", "🐤", "🐈"])
