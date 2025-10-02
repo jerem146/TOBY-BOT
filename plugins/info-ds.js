@@ -23,9 +23,9 @@ break
 }}}
 
 if (filesDeleted === 0) {
-await conn.reply(m.chat, `${emoji2} No se encontró ningún archivo que incluya la ID del chat.`, m)
+await conn.reply(m.chat, `${emoji} No se encontró ningún archivo que incluya la ID del chat.`, m)
 } else {
-await conn.reply(m.chat, `${emoji2} Se eliminaron ${filesDeleted} archivos de sesión.`, m)
+await conn.reply(m.chat, `${emoji} Se eliminaron ${filesDeleted} archivos de sesión.`, m)
 conn.reply(m.chat, `${emoji} ¡Hola! ¿logras verme?`, m)
 }
 } catch (err) {
