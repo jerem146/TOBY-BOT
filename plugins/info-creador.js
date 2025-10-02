@@ -28,7 +28,7 @@ async function handler(m, { conn }) {
       numero: '5216671548329',
       nombre: '⏤͟͞ू⃪ ꒰˘͈ᵕ ˘͈ 𝑳𝒆𝒈𝒏𝒂-𝒄𝒉𝒂𝒏 🪽 ꒱𖦹',
       cargo: 'Co-Desarrolladora y contribudora',
-      nota: 'retirada',
+      nota: 'soporte y editor',
       correo: 'sin información',
       region: '🇲🇽 México',
       web: 'https://github.com/Legna-chan',
