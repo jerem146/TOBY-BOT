@@ -20,8 +20,7 @@ global.owner = [
   ['18294868853', '⏤͟͞ू⃪ ፝͜⁞𝘿𝙞𝙤𝙣𝙚𝙞𝙗𝙞-ʳⁱᵖ ִֶ ࣪˖ ִֶָ🐇་༘', true],
   ['18096758983', '⟆⃝༉⃟⸙ ᯽ N͙e͙v͙i͙-D͙e͙v͙ ⌗⚙️࿐', true],
   ['50248019799', 'NEOTOKIO', true],
-  ['5216671548329', 'ू⃪ ꒰˘͈ᵕ ˘͈ 𝑳𝒆𝒈𝒏𝒂-𝒄𝒉𝒂𝒏 🪽 ꒱𖦹', true],
-  ['51991055096', 'Watashi', true],
+  ['5216671548329', 'ू⃪ ꒰˘͈ᵕ ˘͈ 𝑳𝒆𝒈𝒏𝒂-𝒄𝒉𝒂𝒏 🪽 ꒱𖦹', true], 
 
 // <-- Número @lid -->
   ['200141197844495', 'Dioneibi', true],
@@ -81,69 +80,6 @@ global.estilo = { key: {  fromMe: false, participant: `0@s.whatsapp.net`, ...(fa
 global.ch = {
 ch1: '120363335626706839@newsletter',
 }
-
-//*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
-
-global.cheerio = cheerio
-global.fs = fs
-global.fetch = fetch
-global.axios = axios
-global.moment = moment   
-
-global.rpg = {
-  emoticon(string) {
-    string = string.toLowerCase();
-    const emot = {
-      level: '🌟 Nivel',
-      coin: '💸 Coin',
-      exp: '✨ Experiencia',
-      bank: '🏦 Banco',
-      diamond: '💎 Diamante',
-      health: '❤️ Salud',
-      kyubi: '🌀 Magia',
-      joincount: '💰 Token',
-      emerald: '♦️ Esmeralda',
-      stamina: '⚡ Energía',
-      role: '⚜️ Rango',
-      premium: '🎟️ Premium',
-      pointxp: '📧 Puntos Exp',
-      gold: '👑 Oro',
-      iron: '⛓️ Hierro',
-      coal: '🌑 Carbón',
-      stone: '🪨 Piedra',
-      potion: '🥤 Poción',
-    };
-    const results = Object.keys(emot).map((v) => [v, new RegExp(v, 'gi')]).filter((v) => v[1].test(string));
-    if (!results.length) return '';
-    else return emot[results[0][0]];
-  }};
-global.rpgg = { 
-  emoticon(string) {
-    string = string.toLowerCase();
-    const emott = {
-      level: '🌟',
-      coin: '💸',
-      exp: '✨',
-      bank: '🏦',
-      diamond: '💎',
-      health: '❤️',
-      kyubi: '🌀',
-      joincount: '💰',
-      emerald: '♦️',
-      stamina: '⚡',
-      role: '⚜️',
-      premium: '🎟️',
-      pointxp: '📧',
-      gold: '👑',
-      iron: '⛓️',
-      coal: '🌑',
-      stone: '🪨',
-      potion: '🥤',
-    };
-    const results = Object.keys(emott).map((v) => [v, new RegExp(v, 'gi')]).filter((v) => v[1].test(string));
-    if (!results.length) return '';
-    else return emott[results[0][0]];
-  }};  
 
 //*─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─*
 
