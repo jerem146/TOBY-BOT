@@ -53,78 +53,44 @@ let user = global.db.data.users[sender]
 if (typeof user !== 'object')
 global.db.data.users[sender] = {}
 if (user) {
-if (!isNumber(user.exp))
-user.exp = 0
-if (!isNumber(user.coin))
-user.coin = 10
-if (!isNumber(user.joincount))
-user.joincount = 1
-if (!isNumber(user.diamond))
-user.diamond = 3
-if (!isNumber(user.lastadventure))
-user.lastadventure = 0
-if (!isNumber(user.lastclaim))
-user.lastclaim = 0
-if (!isNumber(user.health))
-user.health = 100
-if (!isNumber(user.crime))
-user.crime = 0
-if (!isNumber(user.lastcofre))
-user.lastcofre = 0
-if (!isNumber(user.lastdiamantes))
-user.lastdiamantes = 0
-if (!isNumber(user.lastpago))
-user.lastpago = 0
-if (!isNumber(user.lastcode))
-user.lastcode = 0
-if (!isNumber(user.lastcodereg))
-user.lastcodereg = 0
-if (!isNumber(user.lastduel))
-user.lastduel = 0
-if (!isNumber(user.lastmining))
-user.lastmining = 0
-if (!('muto' in user))
-user.muto = false
-if (!('premium' in user))
-user.premium = false
-if (!user.premium)
-user.premiumTime = 0
-if (!('registered' in user))
-user.registered = false
-if (!('genre' in user))
-user.genre = ''
-if (!('birth' in user))
-user.birth = ''
-if (!('marry' in user))
-user.marry = ''
-if (!('description' in user))
-user.description = ''
-if (!('packstickers' in user))
-user.packstickers = null
+if (!isNumber(user.exp)) user.exp = 0
+if (!isNumber(user.coin)) user.coin = 10
+if (!isNumber(user.joincount)) user.joincount = 1
+if (!isNumber(user.diamond)) user.diamond = 3
+if (!isNumber(user.lastadventure)) user.lastadventure = 0
+if (!isNumber(user.lastclaim)) user.lastclaim = 0
+if (!isNumber(user.health)) user.health = 100
+if (!isNumber(user.crime)) user.crime = 0
+if (!isNumber(user.lastcofre)) user.lastcofre = 0
+if (!isNumber(user.lastdiamantes)) user.lastdiamantes = 0
+if (!isNumber(user.lastpago)) user.lastpago = 0
+if (!isNumber(user.lastcode)) user.lastcode = 0
+if (!isNumber(user.lastcodereg)) user.lastcodereg = 0
+if (!isNumber(user.lastduel)) user.lastduel = 0
+if (!isNumber(user.lastmining)) user.lastmining = 0
+if (!isNumber(user.lastcmd)) user.lastcmd = 0
+if (!('muto' in user)) user.muto = false
+if (!('premium' in user)) user.premium = false
+if (!user.premium) user.premiumTime = 0
+if (!('registered' in user)) user.registered = false
+if (!('genre' in user)) user.genre = ''
+if (!('birth' in user)) user.birth = ''
+if (!('marry' in user)) user.marry = ''
+if (!('description' in user)) user.description = ''
+if (!('packstickers' in user)) user.packstickers = null
 if (!user.registered) {
-if (!('name' in user))
-user.name = m.name
-if (!isNumber(user.age))
-user.age = -1
-if (!isNumber(user.regTime))
-user.regTime = -1
+if (!('name' in user)) user.name = m.name
+if (!isNumber(user.age)) user.age = -1
+if (!isNumber(user.regTime)) user.regTime = -1
 }
-if (!isNumber(user.afk))
-user.afk = -1
-if (!('afkReason' in user))
-user.afkReason = ''
-if (!('role' in user))
-user.role = 'Nuv'
-if (!('banned' in user))
-user.banned = false
-if (!('useDocument' in user))
-user.useDocument = false
-if (!isNumber(user.level))
-user.level = 0
-if (!isNumber(user.bank))
-user.bank = 0
-if (!isNumber(user.warn))
-user.warn = 0
+if (!isNumber(user.afk)) user.afk = -1
+if (!('afkReason' in user)) user.afkReason = ''
+if (!('role' in user)) user.role = 'Nuv'
+if (!('banned' in user)) user.banned = false
+if (!('useDocument' in user)) user.useDocument = false
+if (!isNumber(user.level)) user.level = 0
+if (!isNumber(user.bank)) user.bank = 0
+if (!isNumber(user.warn)) user.warn = 0
 } else
 global.db.data.users[sender] = {
 exp: 0,
@@ -141,6 +107,7 @@ lastduel: 0,
 lastpago: 0,
 lastmining: 0,
 lastcodereg: 0,
+lastcmd: 0,
 muto: false,
 registered: false,
 genre: '',
@@ -299,6 +266,20 @@ continue
 }
 if (typeof plugin !== 'function') continue
 if ((usedPrefix = (match[0] || '')[0])) {
+let user = global.db.data.users[sender];
+const now = Date.now();
+const time = now - (user.lastcmd || 0);
+const COOLDOWN = 3000;
+
+if (time < COOLDOWN && !isOwner) {
+const remaining = (COOLDOWN - time) / 1000;
+m.reply(`⏱️ Por favor, espera ${remaining.toFixed(1)} segundos antes de usar otro comando.`);
+continue;
+}
+
+const randomDelay = Math.floor(Math.random() * 400) + 200;
+await delay(randomDelay);
+
 let noPrefix = m.text.replace(usedPrefix, '')
 let [command, ...args] = noPrefix.trim().split` `.filter(v => v)
 args = args || []
@@ -313,7 +294,10 @@ typeof plugin.command === 'string' ? plugin.command === command : false
 global.comando = command
 if ((m.id.startsWith('NJX-') || (m.id.startsWith('BAE5') && m.id.length === 16) || (m.id.startsWith('B24E') && m.id.length === 20))) return
 if (!isAccept) { continue }
+
+user.lastcmd = now;
 m.plugin = name
+
 if (m.chat in global.db.data.chats || sender in global.db.data.users) {
 let chat = global.db.data.chats[m.chat]
 let user = global.db.data.users[sender]
