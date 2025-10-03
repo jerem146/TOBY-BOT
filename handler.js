@@ -252,6 +252,17 @@ await delay(time)
 }
 if (m.isBaileys) { return }
 m.exp += Math.ceil(Math.random() * 10)
+
+try {
+const P = global.prefix || /^[.!#\/]/;
+const isCmd = (typeof P === 'string' ? m.text.startsWith(P) : Array.isArray(P) ? P.some(p => m.text.startsWith(p)) : P.test(m.text));
+if (isCmd && m.key) {
+await this.readMessages([m.key]);
+}
+} catch (e) {
+console.error("Error en la lógica de prefijos y lectura:", e);
+}
+
 let usedPrefix
 const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), './plugins')
 for (let name in global.plugins) {
@@ -288,10 +299,6 @@ continue
 }
 if (typeof plugin !== 'function') continue
 if ((usedPrefix = (match[0] || '')[0])) {
-if (m.key) {
-await this.readMessages([m.key]);
-}
-
 let noPrefix = m.text.replace(usedPrefix, '')
 let [command, ...args] = noPrefix.trim().split` `.filter(v => v)
 args = args || []
