@@ -205,9 +205,10 @@ if (!('self' in settings)) settings.self = false
 if (!('restrict' in settings)) settings.restrict = true
 if (!('jadibotmd' in settings)) settings.jadibotmd = true
 if (!('antiPrivate' in settings)) settings.antiPrivate = false
+if (!('moneda' in settings)) settings.moneda = 'Coins'
 if (!('autoread' in settings)) settings.autoread = false
 } else global.db.data.settings[this.user.jid] = {
-self: false, restrict: true, jadibotmd: true, antiPrivate: false, autoread: false, status: 0
+self: false, restrict: true, jadibotmd: true, antiPrivate: false, moneda: 'Coins',  autoread: false, status: 0
 }
 } catch (e) {
 console.error(e)
@@ -241,6 +242,7 @@ const isROwner = [myJid, ...global.owner.map(([number]) => number)]
 const isOwner = isROwner || m.fromMe
 const isMods = isOwner || global.mods.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum)
 const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum) || _user?.premium == true
+const moneda = global.db.data.settings[this.user.jid]?.moneda || 'Coins'
 if (opts['queque'] && m.text && !(isMods || isPrems)) {
 let queque = this.msgqueque, time = 1000 * 5
 const previousID = queque[queque.length - 1]
