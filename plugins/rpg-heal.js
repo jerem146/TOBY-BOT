@@ -9,7 +9,7 @@ let handler = async (m, { conn }) => {
     const cura = 75;
 
     if (user.coin < costoCura) {
-        return conn.reply(m.chat, `💔 No tienes suficientes *${moneda}* para curarte.\nNecesitas al menos *¥${costoCura.toLocaleString()} ${moneda}*.`, m);
+        return conn.reply(m.chat, `💔 No tienes suficientes *${m.moneda}* para curarte.\nNecesitas al menos *¥${costoCura.toLocaleString()} ${m.moneda}*.`, m);
     }
 
     user.health += cura;
@@ -23,12 +23,12 @@ let handler = async (m, { conn }) => {
 ╭───────❍
 │🌸 *¡Curación exitosa!*  
 │❤️ *+${cura}* puntos de vida restaurados
-│💸 *Costo:* ¥${costoCura.toLocaleString()} ${moneda}
+│💸 *Costo:* ¥${costoCura.toLocaleString()} ${m.moneda}
 ╰──────────❍
 
 🏷️ *Estado actual*
 › ❤️ Vida: *${user.health}/100*
-› 💰 Monedas: *¥${user.coin.toLocaleString()} ${moneda}*
+› 💰 Monedas: *¥${user.coin.toLocaleString()} ${m.moneda}*
 `;
 
     await conn.sendMessage(m.chat, { text: mensaje.trim() }, { quoted: m });
