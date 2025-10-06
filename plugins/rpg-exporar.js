@@ -17,12 +17,12 @@ let handler = async (m, { conn, text, command }) => {
   if (!users[senderId]) users[senderId] = { health: 100, coin: 0, exp: 0 }
 
   const eventos = [
-    { nombre: '🌲 Tesoro bajo el Árbol Sagrado', coin: 15000, exp: 120, health: 0, mensaje: `¡Descubriste un cofre antiguo lleno de ${moneda}!` },
-    { nombre: '🐺 Ataque de Lobos Hambrientos', coin: -8000, exp: 40, health: -25, mensaje: `¡Fuiste atacado por una manada y escapaste perdiendo valiosas ${moneda}!` },
+    { nombre: '🌲 Tesoro bajo el Árbol Sagrado', coin: 15000, exp: 120, health: 0, mensaje: `¡Descubriste un cofre antiguo lleno de ${m.moneda}!` },
+    { nombre: '🐺 Ataque de Lobos Hambrientos', coin: -8000, exp: 40, health: -25, mensaje: `¡Fuiste atacado por una manada y escapaste perdiendo valiosas ${m.moneda}!` },
     { nombre: '🔮 Encuentro con una Hechicera', coin: 8000, exp: 60, health: +10, mensaje: 'Una hechicera te bendijo con riquezas y experiencia.' },
     { nombre: '☠️ Trampa Mortal de los Duendes', coin: -12000, exp: 20, health: -30, mensaje: 'Caíste en una trampa y perdiste casi todo tu botín.' },
     { nombre: '🏹 Cazador Errante', coin: 6000, exp: 50, health: 0, mensaje: 'Un cazador te regaló provisiones por ayudarlo.' },
-    { nombre: '💎 Piedra Épica del Alma', coin: 30000, exp: 150, health: 0, mensaje: `¡Una piedra mágica explotó en riqueza de ${moneda}!` },
+    { nombre: '💎 Piedra Épica del Alma', coin: 30000, exp: 150, health: 0, mensaje: `¡Una piedra mágica explotó en riqueza de ${m.moneda}!` },
     { nombre: '🦴 Huesos Mágicos', coin: 4000, exp: 40, health: +5, mensaje: 'Unos huesos antiguos brillaron y te otorgaron fortuna.' },
     { nombre: '🕳️ Foso sin Fondo', coin: -10000, exp: 0, health: -40, mensaje: 'Resbalaste y caíste perdiendo buena parte de tu botín.' },
     { nombre: '🌿 Curandera del Bosque', coin: 0, exp: 60, health: +30, mensaje: 'Una mujer misteriosa sanó tus heridas con magia natural.' },
@@ -49,7 +49,7 @@ let handler = async (m, { conn, text, command }) => {
   let info = `╭─「 *🌲 Exploración del Bosque Mágico* 」─
 │ ✦ Misión: *${evento.nombre}*
 │ ✦ Evento: ${evento.mensaje}
-│ ✦ Recompensa: ${evento.coin >= 0 ? `+¥${evento.coin.toLocaleString()} ${moneda}` : `-¥${Math.abs(evento.coin).toLocaleString()} ${moneda}`}
+│ ✦ Recompensa: ${evento.coin >= 0 ? `+¥${evento.coin.toLocaleString()} ${m.moneda}` : `-¥${Math.abs(evento.coin).toLocaleString()} ${m.moneda}`}
 │ ✦ Exp: +${evento.exp} XP
 │ ✦ Salud: ${evento.health >= 0 ? `+${evento.health}` : `-${Math.abs(evento.health)}`} ❤️
 ╰─────────────────────────`
