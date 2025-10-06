@@ -12,7 +12,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
         let response = `🎟️ *Planes Premium Disponibles* 🎟️\n\n`;
         for (const plan in plans) {
             response += `› *${plan.charAt(0).toUpperCase() + plan.slice(1)}* (${plans[plan].duration} día(s))\n`;
-            response += `  Costo: *¥${plans[plan].cost.toLocaleString()} ${moneda}*\n\n`;
+            response += `  Costo: *¥${plans[plan].cost.toLocaleString()} ${m.moneda}*\n\n`;
         }
         response += `*Ejemplo de uso:*\n${usedPrefix + command} semana`;
         return conn.reply(m.chat, response, m);
@@ -21,12 +21,12 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     const selectedPlan = plans[text];
 
     if (user.coin < selectedPlan.cost) {
-        return conn.reply(m.chat, `❌ No tienes suficiente ${moneda} para este plan. Necesitas *¥${selectedPlan.cost.toLocaleString()}* y solo tienes *¥${user.coin.toLocaleString()}*.`, m);
+        return conn.reply(m.chat, `❌ No tienes suficiente ${m.moneda} para este plan. Necesitas *¥${selectedPlan.cost.toLocaleString()}* y solo tienes *¥${user.coin.toLocaleString()}*.`, m);
     }
 
     user.coin -= selectedPlan.cost;
     user.premium = true;
-    
+
     const newPremiumTime = (user.premiumTime > 0 ? user.premiumTime : Date.now()) + (selectedPlan.duration * 24 * 60 * 60 * 1000);
     user.premiumTime = newPremiumTime;
 
