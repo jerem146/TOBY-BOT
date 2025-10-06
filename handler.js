@@ -192,7 +192,7 @@ if (!('botPrimario' in chat)) chat.botPrimario = null
 } else
 global.db.data.chats[m.chat] = {
 sAutoresponder: '', welcome: true, isBanned: false, autolevelup: false, autoresponder: false, delete: false, autoAceptar: false, autoRechazar: false, detect: true, antiBot: false,
-antiBot2: false, modoadmin: false, antiLink: true, antifake: false, antiArabe: false, reaction: false, nsfw: false, expired: 0,
+antiBot2: false, modoadmin: false, antiLink: true, antifake: false, antiArabe: false, reaction: false, nsw: false, expired: 0,
 welcomeText: null,
 byeText: null,
 audios: false,
@@ -243,6 +243,7 @@ const isOwner = isROwner || m.fromMe
 const isMods = isOwner || global.mods.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum)
 const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum) || _user?.premium == true
 const moneda = global.db.data.settings[this.user.jid]?.moneda || 'Coins'
+m.moneda = moneda;
 if (opts['queque'] && m.text && !(isMods || isPrems)) {
 let queque = this.msgqueque, time = 1000 * 5
 const previousID = queque[queque.length - 1]
@@ -374,7 +375,7 @@ let xp = 'exp' in plugin ? parseInt(plugin.exp) : 17
 if (xp > 200) m.reply('chirrido -_-')
 else m.exp += xp
 if (!isPrems && plugin.coin && global.db.data.users[sender].coin < plugin.coin * 1) {
-this.reply(m.chat, `❮✦❯ Se agotaron tus ${moneda}`, m)
+this.reply(m.chat, `❮✦❯ Se agotaron tus ${m.moneda}`, m)
 continue
 }
 if (plugin.level > _user.level) {
@@ -402,7 +403,7 @@ try {
 await plugin.after.call(this, m, extra)
 } catch (e) { console.error(e) }
 }
-if (m.coin) this.reply(m.chat, `❮✦❯ Utilizaste ${+m.coin} ${moneda}`, m)
+if (m.coin) this.reply(m.chat, `❮✦❯ Utilizaste ${+m.coin} ${m.moneda}`, m)
 }
 break
 }
