@@ -17,7 +17,7 @@ export default async function handler(m, { conn }) {
         }
 
         const carpeta = './media/temu/';
-        
+
         // Verificar si la carpeta existe
         if (!fs.existsSync(carpeta)) {
             return m.reply(`${emoji2} La carpeta de imágenes de pedidos no existe.`);
@@ -59,7 +59,7 @@ export default async function handler(m, { conn }) {
         const nombreLlegada = path.basename(combo.llegada);
 
         // Enviar la imagen de pedido
-        await conn.sendFile(m.chat, combo.pedido, nombrePedido, `✅ Pediste un paquete en Temu\nCosto: ${costo} ${moneda}\nLlega en 30 segundos...`, m);
+        await conn.sendFile(m.chat, combo.pedido, nombrePedido, `✅ Pediste un paquete en Temu\nCosto: ${costo} ${m.moneda}\nLlega en 30 segundos...`, m);
 
         // Enviar la imagen de llegada después de 30 segundos
         setTimeout(() => {
