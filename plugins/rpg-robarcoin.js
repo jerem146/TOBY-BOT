@@ -41,7 +41,7 @@ const handler = async (m, { conn, usedPrefix, command }) => {
     const robAmount = Math.floor(Math.random() * (MAX_ROB - MIN_ROB + 1)) + MIN_ROB;
 
     if (targetUser.coin < MIN_ROB) {
-      return conn.reply(m.chat, `${emoji2} @${target.split("@")[0]} *no tiene al menos ¥${MIN_ROB.toLocaleString()} ${moneda} fuera del banco para que valga la pena intentarlo.*`, m, { mentions: [target] });
+      return conn.reply(m.chat, `${emoji2} @${target.split("@")[0]} *no tiene al menos ¥${MIN_ROB.toLocaleString()} ${m.moneda} fuera del banco para que valga la pena intentarlo.*`, m, { mentions: [target] });
     }
 
     const finalRob = Math.min(robAmount, targetUser.coin);
@@ -54,10 +54,10 @@ const handler = async (m, { conn, usedPrefix, command }) => {
     // if (global.db.write) await global.db.write();
 
     const frases = [
-      `✿ ¡𝚁𝚘𝚋𝚘 𝙴𝚇𝙸𝚃𝙾𝚂𝙾! ✿\nHas saqueado a @${target.split("@")[0]} y te llevaste *¥${finalRob.toLocaleString()} ${moneda}* 💸`,
-      `✿ Tu operación fue silenciosa y eficaz...\n¡Robaste *¥${finalRob.toLocaleString()} ${moneda}* a @${target.split("@")[0]}!`,
-      `✿ Te pusiste la capucha y sin ser visto robaste *¥${finalRob.toLocaleString()} ${moneda}* a @${target.split("@")[0]} 😈`,
-      `✿ 🏃 Escapaste por los callejones oscuros tras robar *¥${finalRob.toLocaleString()} ${moneda}* de @${target.split("@")[0]}`
+      `✿ ¡𝚁𝚘𝚋𝚘 𝙴𝚇𝙸𝚃𝙾𝚂𝙾! ✿\nHas saqueado a @${target.split("@")[0]} y te llevaste *¥${finalRob.toLocaleString()} ${m.moneda}* 💸`,
+      `✿ Tu operación fue silenciosa y eficaz...\n¡Robaste *¥${finalRob.toLocaleString()} ${m.moneda}* a @${target.split("@")[0]}!`,
+      `✿ Te pusiste la capucha y sin ser visto robaste *¥${finalRob.toLocaleString()} ${m.moneda}* a @${target.split("@")[0]} 😈`,
+      `✿ 🏃 Escapaste por los callejones oscuros tras robar *¥${finalRob.toLocaleString()} ${m.moneda}* de @${target.split("@")[0]}`
     ];
 
     await conn.reply(m.chat, pickRandom(frases), m, { mentions: [target] });
