@@ -27,7 +27,7 @@ const handler = async (m, { conn }) => {
 
         const phrase = pickRandom(frasesGanancia).replace('@usuario', `@${targetId.split('@')[0]}`);
         await conn.sendMessage(m.chat, {
-            text: `✨ ${phrase} y ganaste *¥${amount.toLocaleString()} ${moneda}*.`,
+            text: `✨ ${phrase} y ganaste *¥${amount.toLocaleString()} ${m.moneda}*.`,
             contextInfo: { mentionedJid: [targetId] }
         }, { quoted: m });
 
@@ -45,7 +45,7 @@ const handler = async (m, { conn }) => {
         }
 
         const phrase = pickRandom(frasesPerdida);
-        await conn.reply(m.chat, `💔 ${phrase} y perdiste *¥${loss.toLocaleString()} ${moneda}*.`, m);
+        await conn.reply(m.chat, `💔 ${phrase} y perdiste *¥${loss.toLocaleString()} ${m.moneda}*.`, m);
     }
 
     cooldowns[senderId] = Date.now();
