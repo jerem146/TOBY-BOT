@@ -30,7 +30,7 @@ let handler = async (m, { args, conn }) => {
     let precio = null;
 
     if (m.quoted?.text) {
-     
+
         const idMatch = m.quoted.text.match(/𝙄𝘿:\s*\*([^\*]+)\*/i);
         if (!idMatch) return m.reply('✧ No se pudo encontrar el ID del personaje citado.');
         const id = idMatch[1].trim();
@@ -48,7 +48,7 @@ let handler = async (m, { args, conn }) => {
             return m.reply('✧ El precio debe ser un número válido mayor que 0.');
         }
 
-      
+
         const nombre = args.filter(a => a !== precioDetectado).join(' ').toLowerCase();
         const characters = await loadCharacters();
         personaje = characters.find(c => c.name.toLowerCase() === nombre);
@@ -74,7 +74,7 @@ let handler = async (m, { args, conn }) => {
     await saveCharacters(await loadCharacters());
     await saveVentas(ventas);
 
-    m.reply(`✿ Has puesto en venta a *${personaje.name}* por *¥${precio.toLocaleString()} ${moneda}*.`);
+    m.reply(`✿ Has puesto en venta a *${personaje.name}* por *¥${precio.toLocaleString()} ${m.moneda}*.`);
 };
 
 handler.help = ['venderwaifu'];
