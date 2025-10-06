@@ -21,9 +21,9 @@ let handler = async (m, { conn, usedPrefix }) => {
     let texto = `
 ╭─〔 ᥫ᭡ 𝗜𝗡𝗙𝗢 𝗘𝗖𝗢𝗡𝗢́𝗠𝗜𝗖𝗔 ❀ 〕
 │ 👤 Usuario » *${nombre}*
-│ 💸 Dinero » *¥${coin} ${moneda}*
-│ 🏦 Banco » *¥${bank} ${moneda}*
-│ 🧾 Total » *¥${total} ${moneda}*
+│ 💸 Dinero » *¥${coin} ${m.moneda}*
+│ 🏦 Banco » *¥${bank} ${m.moneda}*
+│ 🧾 Total » *¥${total} ${m.moneda}*
 ╰─────────────────────
 > 📌 Usa *${usedPrefix}deposit* para proteger tu dinero en el banco.
     `.trim()
