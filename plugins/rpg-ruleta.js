@@ -32,10 +32,10 @@ let handler = async (m, { conn, text, command, usedPrefix }) => {
   }
 
   if (coin > users.coin) {
-    return conn.reply(m.chat, `《✧》No tienes suficientes *${moneda}* para apostar esa cantidad.`, m)
+    return conn.reply(m.chat, `《✧》No tienes suficientes *${m.moneda}* para apostar esa cantidad.`, m)
   }
 
-  await conn.reply(m.chat, `🎲 Has apostado *¥${coin.toLocaleString()} ${moneda}* al color *${color}*.\n⏳ Espera 10 segundos para conocer el resultado...`, m)
+  await conn.reply(m.chat, `🎲 Has apostado *¥${coin.toLocaleString()} ${m.moneda}* al color *${color}*.\n⏳ Espera 10 segundos para conocer el resultado...`, m)
 
   setTimeout(() => {
     const resultado = Math.random() < 0.50 ? color : (color === 'red' ? 'black' : 'red')
@@ -43,10 +43,10 @@ let handler = async (m, { conn, text, command, usedPrefix }) => {
 
     if (hasGanado) {
       users.coin += coin * 2
-      conn.reply(m.chat, `「✿」La ruleta salió en *${resultado}* 🎉\n> ¡Ganaste *¥${coin.toLocaleString()} ${moneda}*! Tu apuesta fue devuelta también.`, m)
+      conn.reply(m.chat, `「✿」La ruleta salió en *${resultado}* 🎉\n> ¡Ganaste *¥${coin.toLocaleString()} ${m.moneda}*! Tu apuesta fue devuelta también.`, m)
     } else {
       users.coin -= coin
-      conn.reply(m.chat, `「✿」La ruleta salió en *${resultado}* 😿\n> Perdiste *¥${coin.toLocaleString()} ${moneda}*. ¡Suerte para la próxima!`, m)
+      conn.reply(m.chat, `「✿」La ruleta salió en *${resultado}* 😿\n> Perdiste *¥${coin.toLocaleString()} ${m.moneda}*. ¡Suerte para la próxima!`, m)
     }
   }, 10000)
 }
