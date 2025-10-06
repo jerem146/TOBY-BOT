@@ -26,9 +26,9 @@ let handler = async (m, { conn }) => {
   user.exp += exp;
   user.lastclaim = tiempoActual;
 
-  conn.reply(m.chat, `「✿」Has reclamado tu recompensa diaria de *¥${reward.toLocaleString()} ${moneda}*! (Día *${streak}*)\n` +
+  conn.reply(m.chat, `「✿」Has reclamado tu recompensa diaria de *¥${reward.toLocaleString()} ${m.moneda}*! (Día *${streak}*)\n` +
     `> Día *${streak + 1}* » *+¥${(reward + 5000).toLocaleString()}* 🍀\n\n` +
-    `✨ EXP: *+${exp}*\n💎 Diamantes: *+${diamantes}*\n💰 ${moneda}: *+${reward}*`, m);
+    `✨ EXP: *+${exp}*\n💎 Diamantes: *+${diamantes}*\n💰 ${m.moneda}: *+${reward}*`, m);
 }
 
 handler.help = ['daily', 'diario'];
