@@ -137,7 +137,7 @@ let handler = async (m, { conn }) => {
     `⛏️ *${evento.texto}*\n\n` +
     `> *📦 Resultado del minado:*\n` +
     `✨ *Exp:* ${cambios.exp}\n` +
-    `💸 *${moneda}:* ${formato(cambios.coin)}\n` +
+    `💸 *${m.moneda}:* ${formato(cambios.coin)}\n` +
     `♦️ *Esmeralda:* ${formato(cambios.emerald)}\n` +
     `🔩 *Hierro:* ${formato(cambios.iron)}\n` +
     `🏅 *Oro:* ${formato(cambios.gold)}\n` +
