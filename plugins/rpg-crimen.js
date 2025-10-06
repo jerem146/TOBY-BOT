@@ -32,7 +32,7 @@ const handler = async (m, { conn }) => {
         const amount = Math.floor(Math.random() * 15000 + 5000);
         user.coin += amount;
         const reason = pickRandom(frasesExito);
-        await m.reply(`💰 ${reason} y te embolsaste *¥${amount.toLocaleString()} ${moneda}*.\n> Tu saldo: *¥${user.coin.toLocaleString()}* en cartera, *¥${user.bank.toLocaleString()}* en banco.`);
+        await m.reply(`💰 ${reason} y te embolsaste *¥${amount.toLocaleString()} ${m.moneda}*.\n> Tu saldo: *¥${user.coin.toLocaleString()}* en cartera, *¥${user.bank.toLocaleString()}* en banco.`);
     } else {
         const amount = Math.floor(Math.random() * 25000 + 10000);
         let restante = amount;
@@ -56,7 +56,7 @@ const handler = async (m, { conn }) => {
         }
 
         const reason = pickRandom(frasesFracaso);
-        await m.reply(`💀 ${reason} y perdiste *¥${amount.toLocaleString()} ${moneda}* en el proceso.\n> Te queda: *¥${user.coin.toLocaleString()}* en cartera, *¥${user.bank.toLocaleString()}* en banco.`);
+        await m.reply(`💀 ${reason} y perdiste *¥${amount.toLocaleString()} ${m.moneda}* en el proceso.\n> Te queda: *¥${user.coin.toLocaleString()}* en cartera, *¥${user.bank.toLocaleString()}* en banco.`);
     }
 
     cooldowns[senderId] = Date.now();
