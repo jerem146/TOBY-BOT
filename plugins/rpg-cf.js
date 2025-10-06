@@ -2,7 +2,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
   let [eleccion, cantidad] = text.trim().split(' ');
 
   if (!eleccion || !cantidad) {
-    return m.reply(`${emoji} Por favor, elige *cara* o *cruz* y una cantidad de ${moneda} para apostar.\nEjemplo: *${usedPrefix + command} cara 5000*`);
+    return m.reply(`${emoji} Por favor, elige *cara* o *cruz* y una cantidad de ${m.moneda} para apostar.\nEjemplo: *${usedPrefix + command} cara 5000*`);
   }
 
   eleccion = eleccion.toLowerCase();
@@ -18,7 +18,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
   let user = global.db.data.users[m.sender];
   if (!user || user.coin < cantidad) {
-    return m.reply(`${emoji2} No tienes suficientes ${moneda} para apostar. Tienes *${user.coin.toLocaleString()} ${moneda}*.`);
+    return m.reply(`${emoji2} No tienes suficientes ${m.moneda} para apostar. Tienes *${user.coin.toLocaleString()} ${m.moneda}*.`);
   }
 
   // Resultado aleatorio
@@ -29,7 +29,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     user.coin += ganancia;
 
     return conn.reply(m.chat,
-`「✿」La moneda ha caído en *${resultado.toUpperCase()}* y has ganado *¥${ganancia.toLocaleString()} ${moneda}*! 🍀
+`「✿」La moneda ha caído en *${resultado.toUpperCase()}* y has ganado *¥${ganancia.toLocaleString()} ${m.moneda}*! 🍀
 > Tu elección fue *${eleccion.toUpperCase()}*
 ✨ ¡La suerte estuvo de tu lado! ✨`, m);
   } else {
@@ -37,7 +37,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     user.coin -= perdida;
 
     return conn.reply(m.chat,
-`🥀 La moneda cayó en *${resultado.toUpperCase()}* y perdiste *¥${perdida.toLocaleString()} ${moneda}*...
+`🥀 La moneda cayó en *${resultado.toUpperCase()}* y perdiste *¥${perdida.toLocaleString()} ${m.moneda}*...
 > Tú habías elegido *${eleccion.toUpperCase()}*
 💔 ¡Sigue intentando, no te rindas!`, m);
   }
