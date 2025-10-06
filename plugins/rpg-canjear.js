@@ -25,7 +25,7 @@ let handler = async (m, { conn, text }) => {
 
     let remaining = 50 - codesDB[code].claimedBy.length;
 
-    conn.reply(m.chat, `${emoji} Has canjeado el código con éxito. Has recibido ${codesDB[code].coin} ${moneda}.\nQuedan ${remaining} vacantes para canjear el código.`, m);
+    conn.reply(m.chat, `${emoji} Has canjeado el código con éxito. Has recibido ${codesDB[code].coin} ${m.moneda}.\nQuedan ${remaining} vacantes para canjear el código.`, m);
 }
 
 handler.help = ['canjear <código>'];
