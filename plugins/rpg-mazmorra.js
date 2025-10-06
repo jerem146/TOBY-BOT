@@ -18,11 +18,11 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   }
 
   const eventos = [
-    { nombre: 'Mazmorras de los Caídos', tipo: 'victoria', coin: randomNumber(150, 300), exp: randomNumber(50, 100), health: 0, mensaje: `🏆 ¡Has derrotado al guardián! Al abrir su cofre, encontraste un montón de ${moneda}.` },
-    { nombre: 'Cámara de los Espectros', tipo: 'derrota', coin: randomNumber(-70, -40), exp: randomNumber(10, 20), health: randomNumber(-15, -5), mensaje: `⚠️ Un espectro te ha atrapado en su red de sombras. Perdiste algunas ${moneda} mientras logras escaparte.` },
-    { nombre: 'Cripta del Olvido', tipo: 'victoria', coin: randomNumber(250, 400), exp: randomNumber(100, 150), health: 0, mensaje: `💎 Te adentras y descubres un tesoro antiguo lleno de gemas y ${moneda}.` },
+    { nombre: 'Mazmorras de los Caídos', tipo: 'victoria', coin: randomNumber(150, 300), exp: randomNumber(50, 100), health: 0, mensaje: `🏆 ¡Has derrotado al guardián! Al abrir su cofre, encontraste un montón de ${m.moneda}.` },
+    { nombre: 'Cámara de los Espectros', tipo: 'derrota', coin: randomNumber(-70, -40), exp: randomNumber(10, 20), health: randomNumber(-15, -5), mensaje: `⚠️ Un espectro te ha atrapado en su red de sombras. Perdiste algunas ${m.moneda} mientras logras escaparte.` },
+    { nombre: 'Cripta del Olvido', tipo: 'victoria', coin: randomNumber(250, 400), exp: randomNumber(100, 150), health: 0, mensaje: `💎 Te adentras y descubres un tesoro antiguo lleno de gemas y ${m.moneda}.` },
     { nombre: 'Trampa del Laberinto', tipo: 'trampa', coin: 0, exp: randomNumber(5, 10), health: 0, mensaje: `🚧 Activaste una trampa oculta. Afortunadamente, logras salir ileso, pero no ganaste nada.` },
-    { nombre: 'Cámara de los Demonios', tipo: 'derrota', coin: randomNumber(-150, -80), exp: randomNumber(20, 40), health: randomNumber(-30, -20), mensaje: `🐉 Un feroz demonio te embosca en la oscuridad. Logras escapar, pero no sin perder algunas ${moneda} y salud.` },
+    { nombre: 'Cámara de los Demonios', tipo: 'derrota', coin: randomNumber(-150, -80), exp: randomNumber(20, 40), health: randomNumber(-30, -20), mensaje: `🐉 Un feroz demonio te embosca en la oscuridad. Logras escapar, pero no sin perder algunas ${m.moneda} y salud.` },
     { nombre: 'Santuario de la Luz', tipo: 'victoria', coin: randomNumber(100, 200), exp: randomNumber(30, 60), health: 0, mensaje: `🎆 Encuentras un cofre repleto de riquezas que brillan intensamente.` },
     { nombre: 'Laberinto de los Perdidos', tipo: 'trampa', coin: 0, exp: randomNumber(5, 15), health: 0, mensaje: `🌀 Te adentras en un laberinto confuso. Logras salir, pero no obtienes recompensas.` },
     { nombre: 'Ruinas de los Caídos', tipo: 'victoria', coin: randomNumber(150, 300), exp: randomNumber(70, 120), health: 0, mensaje: `🏺 Descubres artefactos antiguos que brillan con un encanto misterioso y te recompensan.` },
@@ -48,7 +48,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
   let info = `╭━〔 Mazmoras Antiguas 〕\n` +
              `┃Misión: *${evento.nombre}*\n` +
              `┃Evento: ${evento.mensaje}\n` +
-             `┃Recompensa: ${evento.coin > 0 ? '+' : '-'}${Math.abs(evento.coin)} *${moneda}* y +${evento.exp} *XP*.\n` +
+             `┃Recompensa: ${evento.coin > 0 ? '+' : '-'}${Math.abs(evento.coin)} *${m.moneda}* y +${evento.exp} *XP*.\n` +
              `┃Tu salud ${evento.health < 0 ? 'bajó en: ' + Math.abs(evento.health) : 'se mantuvo igual.'}\n` +
              `╰━━━━━━━━━━━━⬣`;
 
