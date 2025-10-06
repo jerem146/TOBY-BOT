@@ -7,7 +7,7 @@ let handler = async (m, { conn, usedPrefix }) => {
     if (!(who in global.db.data.users)) {
         return conn.reply(m.chat, `${emoji} El usuario no se encuentra en mi base de Datos.`, m);
     }
-    
+
     let img = 'https://qu.ax/fRMNm.jpg';
     let user = global.db.data.users[who];
     let name = conn.getName(who);
@@ -15,8 +15,8 @@ let handler = async (m, { conn, usedPrefix }) => {
     let premium = user.premium ? '✅' : '❌';
 
     let text = `╭━〔 Inventario de ${name} 〕⬣\n` +
-               `┋ 💸 *${moneda} en Cartera:* ${user.coin || 0}\n` +  
-               `┋ 🏦 *${moneda} en Banco:* ${user.bank || 0}\n` + 
+               `┋ 💸 *${m.moneda} en Cartera:* ${user.coin || 0}\n` +  
+               `┋ 🏦 *${m.moneda} en Banco:* ${user.bank || 0}\n` + 
                `┋ ♦️ *Esmeraldas:* ${user.emerald || 0}\n` + 
                `┋ 🔩 *Hierro:* ${user.iron || 0}\n` +  
                `┋ 🏅 *Oro:* ${user.gold || 0}\n` + 
