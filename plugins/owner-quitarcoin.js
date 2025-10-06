@@ -15,9 +15,9 @@ let handler = async (m, { conn, text }) => {
     } else {
         who = m.chat;
     }
-    
+
     if (!who) return m.reply(`${emoji} Por favor, menciona al usuario o cita un mensaje.`);
-    
+
     let txt = text.replace('@' + who.split`@`[0], '').trim();
     let dmt;
 
@@ -26,18 +26,18 @@ let handler = async (m, { conn, text }) => {
     } else {
         if (!txt) return m.reply(`${emoji} Por favor, ingresa la cantidad que deseas quitar.`);
         if (isNaN(txt)) return m.reply(`${emoji2} sólo números.`);
-        
+
         dmt = parseInt(txt);
     }
-    
+
     let users = global.db.data.users;
-    
+
     if (users[who].coin < dmt) {
-        return m.reply(`${emoji2} El usuario no tiene suficientes coin para quitar. Tiene ${users[who].coin} ${moneda}.`);
+        return m.reply(`${emoji2} El usuario no tiene suficientes coin para quitar. Tiene ${users[who].coin} ${m.moneda}.`);
     }
 
     users[who].coin -= dmt;
-    
+
     m.reply(`💸 *Quitado:*
 » ${dmt} \n@${who.split('@')[0]}, te han quitado ${dmt} 💸`, null, { mentions: [who] });
 };
