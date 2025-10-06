@@ -44,6 +44,12 @@ return;
 }
 }
 
+    if (m.isGroup && global.conns && global.conns.length > 1) {
+        let botsEnGrupo = global.conns.filter(c => c.user && c.user.jid && c.ws && c.ws.socket && c.ws.socket.readyState !== 3)
+        let elegido = botsEnGrupo[Math.floor(Math.random() * botsEnGrupo.length)]
+        if (this.user.jid !== elegido.user.jid) return
+    }
+
 sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid;
 
 m.exp = 0
@@ -192,7 +198,7 @@ if (!('botPrimario' in chat)) chat.botPrimario = null
 } else
 global.db.data.chats[m.chat] = {
 sAutoresponder: '', welcome: true, isBanned: false, autolevelup: false, autoresponder: false, delete: false, autoAceptar: false, autoRechazar: false, detect: true, antiBot: false,
-antiBot2: false, modoadmin: false, antiLink: true, antifake: false, antiArabe: false, reaction: false, nsfw: false, expired: 0,
+antiBot2: false, modoadmin: false, antiLink: true, antifake: false, antiArabe: false, reaction: false, nsw: false, expired: 0,
 welcomeText: null,
 byeText: null,
 audios: false,
