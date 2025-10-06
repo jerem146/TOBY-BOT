@@ -19,7 +19,7 @@ let handler = async (m, { conn }) => {
     m.reply(`
 🎁 ¡Ha pasado una semana! ¡Disfruta de tu regalo semanal!.
 
-💸 *${moneda}* : +${coinReward}
+💸 *${m.moneda}* : +${coinReward}
 ✨ *Experiencia* : +${expReward}`);
 
     user.weekly = new Date * 1;
@@ -41,6 +41,6 @@ function msToTime(duration) {
     var days = Math.floor(duration / (1000 * 60 * 60 * 24));
     var hours = Math.floor((duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     var minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     return `${days} días ${hours} horas ${minutes} minutos`;
 }
