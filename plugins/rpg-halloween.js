@@ -33,7 +33,7 @@ var handler = async (m, { conn }) => {
     m.reply(`
 \`\`\`🎃 ¡Feliz Halloween! ¡Disfruta de tu regalo de Halloween! 👻\`\`\`
 
-💸 *${moneda}* : +${coinReward}
+💸 *${m.moneda}* : +${coinReward}
 🍬 *Dulces* : +${candyReward}
 ✨ *Experiencia* : +${expReward}
 🎃 *Regalos de Halloween* : +${giftReward}`);
@@ -57,6 +57,6 @@ function msToTime(duration) {
     var days = Math.floor(duration / (1000 * 60 * 60 * 24));
     var hours = Math.floor((duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     var minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     return `${days} días ${hours} horas ${minutes} minutos`;
 }
