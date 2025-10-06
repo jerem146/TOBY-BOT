@@ -26,7 +26,7 @@ let handler = async (m, { conn }) => {
 │
 │ ✿ ¡𝙷𝚊𝚜 𝚛𝚎𝚌𝚕𝚊𝚖𝚊𝚍𝚘 𝚝𝚞 𝚁𝙴𝙶𝙰𝙻𝙾 𝙼𝙴𝙽𝚂𝚄𝙰𝙻!
 │
-│ 💸 ${moneda} : *+¥${coinReward.toLocaleString()}*
+│ 💸 ${m.moneda} : *+¥${coinReward.toLocaleString()}*
 │ ✨ Experiencia : *+${expReward} XP*
 │ 💎 Diamantes : *+${diamondReward}*
 ╰─────────────────────────────
