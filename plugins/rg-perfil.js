@@ -61,8 +61,8 @@ let handler = async (m, { conn }) => {
 ⧉ 𖦹 𝖤𝗑𝗉 » ${exp.toLocaleString()}
 ⧉ 𖦹 𝖱𝖺𝗇𝗀𝗈 » ${role}
 
-⧉ 𖦹 𝖢𝗈𝗂𝗇𝗌 » ${coins.toLocaleString()} ${moneda}
-⧉ 𖦹 𝖡𝖺𝗇𝗄 » ${bankCoins.toLocaleString()} ${moneda}
+⧉ 𖦹 𝖢𝗈𝗂𝗇𝗌 » ${coins.toLocaleString()} ${m.moneda}
+⧉ 𖦹 𝖡𝖺𝗇𝗄 » ${bankCoins.toLocaleString()} ${m.moneda}
 ⧉ 𖦹 𝖯𝗋𝖾𝗆𝗂𝗎𝗆 » ${user.premium ? '✔ Activo' : '✘ Inactivo'}
 ㅤㅤ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯ ⎯  
 > ⋆｡°✩ 𝖯𝗋𝗈𝗉𝗂𝖾𝗍𝖺𝗋𝗂𝗈 ᴅᴇ ʟᴀ ʙᴏᴛ: ${dev} ⋆｡°✩
