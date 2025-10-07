@@ -12,7 +12,7 @@ let handler = async (m, { conn, text }) => {
 `*–––––『 MONEDA DEL BOT 』–––––*
 
 Por favor, proporciona un nombre para la moneda.
-> *Ejemplo:* #setmoneda Diamantes 💎
+> *Ejemplo:* #setmoneda Diamantes 
 
 *Moneda actual:* ${currentMoneda}`
     );
