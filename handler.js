@@ -44,11 +44,11 @@ return;
 }
 }
 
-    if (m.isGroup && global.conns && global.conns.length > 1) {
-        let botsEnGrupo = global.conns.filter(c => c.user && c.user.jid && c.ws && c.ws.socket && c.ws.socket.readyState !== 3)
-        let elegido = botsEnGrupo[Math.floor(Math.random() * botsEnGrupo.length)]
-        if (this.user.jid !== elegido.user.jid) return
-    }
+if (m.isGroup && global.conns && global.conns.length > 1) {
+let botsEnGrupo = global.conns.filter(c => c.user && c.user.jid && c.ws && c.ws.socket && c.ws.socket.readyState !== 3)
+let elegido = botsEnGrupo[Math.floor(Math.random() * botsEnGrupo.length)]
+if (this.user.jid !== elegido.user.jid) return
+}
 
 sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid;
 
@@ -214,7 +214,7 @@ if (!('antiPrivate' in settings)) settings.antiPrivate = false
 if (!('moneda' in settings)) settings.moneda = 'Coins'
 if (!('autoread' in settings)) settings.autoread = false
 } else global.db.data.settings[this.user.jid] = {
-self: false, restrict: true, jadibotmd: true, antiPrivate: false, moneda: 'Coins',  autoread: false, status: 0
+self: false, restrict: true, jadibotmd: true, antiPrivate: false, moneda: 'Coins', autoread: false, status: 0
 }
 } catch (e) {
 console.error(e)
@@ -222,29 +222,21 @@ console.error(e)
 
 if (opts['nyimak']) return
 if (!m.fromMe && opts['self']) return
-if (opts['swonly'] && m.chat !== 'status@broadcast') return
+if (opts['swonly' && m.chat !== 'status@broadcast']) return
 if (typeof m.text !== 'string')
 m.text = ''
 
-let _user = global.db.data && global.db.data.users && global.db.data.users[sender]
-const groupMetadata = (m.isGroup ? ((this.chats[m.chat] || {}).metadata || await this.groupMetadata(m.chat).catch(_ => null)) : {}) || {}
-const participants = (m.isGroup ? groupMetadata.participants : []) || []
-const cleanJid = jid => jid?.split(':')[0] || ''
-const normalizeJid = jid => jid?.replace(/[^0-9]/g, '')
-const senderNum = normalizeJid(sender)
-const botNums = [this.user.jid, this.user.lid].map(j => normalizeJid(cleanJid(j)))
-const user = m.isGroup ? participants.find(u => normalizeJid(u.id) === senderNum) : {}
-const bot = m.isGroup ? participants.find(u => botNums.includes(normalizeJid(u.id))) : {}
-const isRAdmin = user?.admin === 'superadmin' || false
-const isAdmin = isRAdmin || user?.admin === 'admin' || false
-const isBotAdmin = !!bot?.admin
+const _user = global.db.data.users[sender]
+const groupMetadata = m.isGroup ? { ...(this.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((this.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((this.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
+const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
+const userGroup = (m.isGroup ? participants.find((u) => this.decodeJid(u.jid) === sender) : {}) || {}
+const botGroup = (m.isGroup ? participants.find((u) => this.decodeJid(u.jid) == this.user.jid) : {}) || {}
+const isRAdmin = userGroup?.admin == "superadmin" || false
+const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
+const isBotAdmin = botGroup?.admin || false
 
-const myJid = this.user?.id ? this.decodeJid(this.user.id) : '';
-const isROwner = [myJid, ...global.owner.map(([number]) => number)]
-.filter(Boolean)
-.map(v => v.replace(/[^0-9]/g, ''))
-.includes(senderNum);
-
+const senderNum = sender.split('@')[0];
+const isROwner = [...global.owner.map(([number]) => number), this.user.jid.split('@')[0]].includes(senderNum);
 const isOwner = isROwner || m.fromMe
 const isMods = isOwner || global.mods.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum)
 const isPrems = isROwner || global.prems.map(v => v.replace(/[^0-9]/g, '')).includes(senderNum) || _user?.premium == true
@@ -291,7 +283,7 @@ typeof _prefix === 'string' ? [[new RegExp(str2Regex(_prefix)).exec(m.text), new
 ).find(p => p[1])
 if (typeof plugin.before === 'function') {
 if (await plugin.before.call(this, m, {
-match, conn: this, participants, groupMetadata, user, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename
+match, conn: this, participants, groupMetadata, user: userGroup, bot: botGroup, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename
 }))
 continue
 }
@@ -389,7 +381,7 @@ this.reply(m.chat, `❮✦❯ Se requiere el nivel: *${plugin.level}*\n\n• Tu 
 continue
 }
 let extra = {
-match, usedPrefix, noPrefix, _args, args, command, text, conn: this, participants, groupMetadata, user, bot, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename
+match, usedPrefix, noPrefix, _args, args, command, text, conn: this, participants, groupMetadata, user: userGroup, bot: botGroup, isROwner, isOwner, isRAdmin, isAdmin, isBotAdmin, isPrems, chatUpdate, __dirname: ___dirname, __filename
 }
 try {
 await plugin.call(this, m, extra)
