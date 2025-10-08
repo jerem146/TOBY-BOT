@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 let handler = async (m, { conn, text, usedPrefix }) => {
-if (!text) return m.reply(`🌸 Por favor, ingresa lo que deseas buscar por Pinterest 🌸`)
+if (!text) return m.reply(`(*∩_∩*) ⍴᥆r 𝖿ᥲ᥎᥆r, іᥒgrᥱsᥲ ᥣ᥆ 𝗊ᥙᥱ ძᥱsᥱᥲs ᑲᥙsᥴᥲr ⍴᥆r ⍴іᥒ𝗍ᥱrᥱs𝗍 🌸`)
 
 try {
 await m.react('🕒')
@@ -22,7 +22,7 @@ for (let i = 0; i < medias.length; i++) {
 await conn.sendMessage(m.chat, {
 image: { url: medias[i].data.url },
 caption: i === 0
-? `⍨⃝  Pinterest Search 🌸\n\n✧ 📌 Búsqueda » «${text}»\n✐ 💎 Resultados » ${medias.length} imágenes encontradas`
+? `(*ˊᗜˋ*) ᑲᥙ́s𝗊ᥙᥱძᥲ ᥊ ⍴іᥒ𝗍ᥱrᥱs𝗍\n\n✧ 📌 𝗍і𝗍ᥙᥣ᥆ » «${text}»\n✐ 💎 rᥱsᥙᥣ𝗍ᥲძ᥆s » ${medias.length} іmᥲ́gᥱᥒᥱs ᥱᥒᥴ᥆ᥒ𝗍rᥲძᥲs`
 : `✧ ${medias[i].data.title || 'Sin título'}`
 }, { quoted: m })
 }
