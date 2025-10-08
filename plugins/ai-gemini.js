@@ -1,7 +1,7 @@
 import fetch from 'node-fetch'
 
 var handler = async (m, { text, usedPrefix, command, conn }) => {
-if (!text) return conn.reply(m.chat, `⚠︎ Ingrese una petición para que Gemini lo responda.`, m)
+if (!text) return conn.reply(m.chat, `(｡•ᴗ•) іᥒgrᥱsᥲ ᥙᥒ 𝗍ᥱ᥊𝗍᥆ ȷᥙᥒ𝗍᥆ ᥲᥣ ᥴ᥆mᥲᥒძ᥆ ⍴ᥲrᥲ 𝗊ᥙᥱ gᥱ́mіᥒіs ᥣ᥆ rᥱs⍴᥆ᥒძᥲ`, m)
 
 try {
 await m.react('🕒')
