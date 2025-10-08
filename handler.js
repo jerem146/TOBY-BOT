@@ -184,6 +184,7 @@ if (!('autoresponder' in chat)) chat.autoresponder = false
 if (!('detect' in chat)) chat.detect = true
 if (!('audios' in chat)) chat.audios = false
 if (!('antiBot' in chat)) chat.antiBot = false
+if (!("primaryBot" in chat)) chat.primaryBot = null
 if (!('antiBot2' in chat)) chat.antiBot2 = false
 if (!('modoadmin' in chat)) chat.modoadmin = false
 if (!('antiLink' in chat)) chat.antiLink = true
@@ -234,6 +235,18 @@ const botGroup = (m.isGroup ? participants.find((u) => this.decodeJid(u.jid) == 
 const isRAdmin = userGroup?.admin == "superadmin" || false
 const isAdmin = isRAdmin || userGroup?.admin == "admin" || false
 const isBotAdmin = botGroup?.admin || false
+
+// Primary by: Alex 🐼
+if (global.db.data.chats[m.chat].primaryBot && global.db.data.chats[m.chat].primaryBot !== this.user.jid) {
+const primaryBotConn = global.conns.find(conn => conn.user.jid === global.db.data.chats[m.chat].primaryBot && conn.ws.socket && conn.ws.socket.readyState !== ws.CLOSED)
+const participants = m.isGroup ? (await this.groupMetadata(m.chat).catch(() => ({ participants: [] }))).participants : []
+const primaryBotInGroup = participants.some(p => p.jid === global.db.data.chats[m.chat].primaryBot)
+if (primaryBotConn && primaryBotInGroup || global.db.data.chats[m.chat].primaryBot === global.conn.user.jid) {
+throw !1
+} else {
+global.db.data.chats[m.chat].primaryBot = null
+}} else {
+}
 
 const senderNum = sender.split('@')[0];
 const isROwner = [...global.owner.map(([number]) => number), this.user.jid.split('@')[0]].includes(senderNum);
