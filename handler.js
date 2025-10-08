@@ -33,22 +33,32 @@ if (!m)
 return
 
 const chatDB = global.db.data.chats[m.chat];
+
 if (chatDB && chatDB.botPrimario) {
-const universalWords = ['resetbot', 'resetprimario', 'botreset'];
-const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
+    const universalWords = ['resetbot', 'resetprimario', 'botreset'];
+    const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase() : '';
 
-if (!universalWords.includes(firstWord)) {
-if (chatDB.botPrimario !== this.user.jid) {
-return;
-}
-}
+    if (!universalWords.includes(firstWord)) {
+        if (chatDB.botPrimario !== this.user.jid) {
+            return;
+        }
+    }
+} else if (m.isGroup && global.conns && global.conns.length > 1) {
+    const botsActivos = global.conns.filter(conn => conn.user && conn.ws.socket.readyState === ws.OPEN);
+    
+    if (botsActivos.length > 1) {
+        botsActivos.sort((a, b) => a.user.jid.localeCompare(b.user.jid));
+        
+        const timestamp = m.messageTimestamp.low || m.messageTimestamp;
+        const indiceElegido = timestamp % botsActivos.length;
+        const botElegido = botsActivos[indiceElegido];
+
+        if (this.user.jid !== botElegido.user.jid) {
+            return;
+        }
+    }
 }
 
-if (m.isGroup && global.conns && global.conns.length > 1) {
-let botsEnGrupo = global.conns.filter(c => c.user && c.user.jid && c.ws && c.ws.socket && c.ws.socket.readyState !== 3)
-let elegido = botsEnGrupo[Math.floor(Math.random() * botsEnGrupo.length)]
-if (this.user.jid !== elegido.user.jid) return
-}
 
 sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid;
 
@@ -444,14 +454,14 @@ try {
 if (!opts['noprint']) await (await import(`./lib/print.js`)).default(m, this)
 } catch (e) { console.log(m, m.quoted, e) }
 let settingsREAD = global.db.data.settings[this.user.jid] || {}
-// if (settingsREAD.autoread) await this.readMessages([m.key]) 
+// if (settingsREAD.autoread) await this.readMessages([m.key]) 
 
 }
 }
 global.dfail = (type, m, conn) => {
-  const msg = {
-    rowner: '「🌺」 *Gomenasai~! Esta función solo la puede usar mi creador celestial...* 🌌\n\n> *Dioneibi-sama.*',
-    owner: '「🌸」 *¡Nyaa~! Solo mi creador y programadores pueden usar este comando~!* 💾💕',
+  const msg = {
+    rowner: '「🌺」 *Gomenasai~! Esta función solo la puede usar mi creador celestial...* 🌌\n\n> *Dioneibi-sama.*',
+    owner: '「🌸」 *¡Nyaa~! Solo mi creador y programadores pueden usar este comando~!* 💾💕',
     mods: '「🌟」 *Uguu~ Esto eso solo lo pueden usar mis desarrolladores mágicos~!* 🔮',
     premium: '「🍡」 *Ehh~? Esta función es exclusiva para usuarios Premium-desu~!* ✨\n\n💫 *¿No eres premium aún? Consíguelo ahora usando:*\n> ✨ *.comprarpremium 2 dias*  (o reemplaza "2 dias" por la cantidad que desees).',
     group: '「🐾」 *¡Onii-chan~! Este comando solo puede usarse en grupos grupales~!* 👥',
