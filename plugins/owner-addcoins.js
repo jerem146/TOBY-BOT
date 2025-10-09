@@ -1,44 +1,40 @@
-import db from '../lib/database.js';
-import MessageType from '@whiskeysockets/baileys';
-
-let impts = 0;
+// import db from '../lib/database.js';
+// import MessageType from '@whiskeysockets/baileys';
 
 let handler = async (m, { conn, text }) => {
     let who;
     if (m.isGroup) {
-        if (m.mentionedJid.length > 0) {
-            who = m.mentionedJid[0];
-        } else {
-            const quoted = m.quoted ? m.quoted.sender : null;
-            who = quoted ? quoted : m.chat;
-        }
+        who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : null;
     } else {
         who = m.chat;
     }
-    
-    if (!who) return m.reply(`${emoji} Por favor, menciona al usuario o cita un mensaje.`);
-    
-    let txt = text.replace('@' + who.split`@`[0], '').trim();
-    if (!txt) return m.reply(`${emoji} Por favor, ingresa la cantidad que deseas añadir.`);
-    if (isNaN(txt)) return m.reply(`${emoji2} sólo números.`);
-    
-    let dmt = parseInt(txt);
-    let coin = dmt;
-    let pjk = Math.ceil(dmt * impts);
-    coin += pjk;
-    
-    if (coin < 1) return m.reply(`${emoji2} Mínimo es *1*`);
-    
-    let users = global.db.data.users;
-    users[who].coin += dmt;
-    
-    m.reply(`💸 *Añadido:*
-» ${dmt} \n@${who.split('@')[0]}, recibiste ${dmt} 💸`, null, { mentions: [who] });
+
+    if (!who) return m.reply(`*⚠️ Por favor, menciona al usuario o responde a su mensaje.*`);
+
+    let txt = text.replace(/@\d{5,}/g, '').trim();
+    if (!txt) return m.reply(`*⚠️ Debes ingresar la cantidad de coins que quieres añadir.*`);
+    if (isNaN(txt)) return m.reply(`*⚠️ La cantidad debe ser un número.*`);
+
+    let amount = parseInt(txt);
+    if (amount < 1) return m.reply(`*⚠️ La cantidad mínima para añadir es 1.*`);
+
+    if (!global.db.data.users[who]) {
+        global.db.data.users[who] = {
+            coin: 0,
+        };
+    }
+
+    global.db.data.users[who].coin = (global.db.data.users[who].coin || 0) + amount;
+
+    await conn.sendMessage(m.chat, {
+        text: `*✅ Transacción exitosa!*\n\n*Cantidad:* ${amount} 💸\n*Para:* @${who.split('@')[0]}`,
+        mentions: [who]
+    }, { quoted: m });
 };
 
-handler.help = ['addcoins *<@user>*'];
+handler.help = ['addcoins <@usuario> <cantidad>'];
 handler.tags = ['owner'];
-handler.command = ['añadircoin', 'addcoin', 'addcoins']; 
+handler.command = ['añadircoin', 'addcoin', 'addcoins'];
 handler.rowner = true;
 
 export default handler;
