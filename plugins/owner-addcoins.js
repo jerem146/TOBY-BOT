@@ -1,40 +1,109 @@
-let handler = async (m, { conn, text }) => {
-    let who;
+import db from '../lib/database.js'
+import MessageType from '@whiskeysockets/baileys'
 
-    if (m.quoted) {
-        who = m.quoted.sender;
-    } 
-    else if (m.mentionedJid && m.mentionedJid[0]) {
-        who = m.mentionedJid[0];
-    } 
-    else {
-        return m.reply(`*⚠️ Debes responder al mensaje de un usuario o mencionarlo para añadirle coins.*`);
-    }
+const handler = async (m, { conn, text, args, command, isROwner }) => {
+if (!isROwner) return
+try {
+const now = Date.now()
+const user = global.db.data.users
+let mentionedJid = await m.mentionedJid
+let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
+switch (command) {
+case 'addcoin': {
+if (!who) return m.reply('❀ Por favor, menciona al usuario o cita un mensaje.')
+const coinTxt = text.replace(/^@\S+\s*/, '').trim().split(' ')[0]
+if (!coinTxt) return m.reply(`ꕥ Por favor, ingresa la cantidad que deseas añadir.`)
+if (isNaN(coinTxt)) return m.reply(`ꕥ Solo se permiten números.`)
+await m.react('🕒')
+const dmt = parseInt(coinTxt)
+const impts = 0
+const pjkC = Math.ceil(dmt * impts)
+if (dmt + pjkC < 1) return m.react('✖️'), m.reply(`ꕥ Mínimo es *1*`)
+user[who].coin += dmt
+await m.react('✔️')
+m.reply(`❀ *Añadido:*\n» ${dmt} \n@${who.split('@')[0]}, recibiste ${dmt} ${currency}`, null, { mentions: [who] })
+break
+}
+case 'addxp': {
+if (!who) return m.reply('❀ Por favor, menciona al usuario o cita un mensaje.')
+const xpTxt = text.replace(/^@\S+\s*/, '').trim().split(' ')[0]
+if (!xpTxt) return m.reply(`ꕥ Ingresa la cantidad de experiencia (XP) que deseas añadir.`)
+if (isNaN(xpTxt)) return m.reply(`ꕥ Solo números son permitidos.`)
+await m.react('🕒')
+const xp = parseInt(xpTxt)
+const pajak = 0
+const pjkX = Math.ceil(xp * pajak)
+if (xp + pjkX < 1) return m.react('✖️'), m.reply(`ꕥ El mínimo de experiencia (XP) es *1*`)
+user[who].exp += xp
+await m.react('✔️')
+m.reply(`❀ XP Añadido: *${xp}* \n@${who.split('@')[0]}, recibiste ${xp} XP`, null, { mentions: [who] })
+break
+}
+case 'addprem': {
+if (!who) return m.reply('❀ Por favor, menciona al usuario o cita un mensaje.')
+if (!user[who]) user[who] = { premiumTime: 0, premium: false }
+const premArgs = text.split(' ').filter(arg => arg)
+if (premArgs.length < 2) return m.reply('ꕥ Envía un tiempo válido\n> Ejemplo (1h, 2d, 3s, 4m).')
+await m.react('🕒')
+let tiempo = 0
+const cant = parseInt(premArgs[0])
+const unidad = premArgs[1]
+if (unidad === 'h') tiempo = 3600000 * cant
+else if (unidad === 'd') tiempo = 86400000 * cant
+else if (unidad === 's') tiempo = 604800000 * cant
+else if (unidad === 'm') tiempo = 2592000000 * cant
+else return m.react('✖️'), m.reply('ꕥ Tiempo inválido.\nOpciones:\n h = horas, d = días, s = semanas, m = meses')
+user[who].premiumTime = now < user[who].premiumTime ? user[who].premiumTime + tiempo : now + tiempo
+user[who].premium = true
+const timeLeft = await formatTime(user[who].premiumTime - now)
+await m.react('✔️')
+m.reply(`✰ Nuevo Usuario Premium!!!\n\nᰔᩚ Usuario » @${who.split('@')[0]}\nⴵ Tiempo Premium » ${cant}${unidad}\n✧ Tiempo Restante » ${timeLeft}`, null, { mentions: [who] })
+break
+}
+case 'delprem': {
+if (!who) return m.reply('❀ Por favor, menciona al usuario o cita un mensaje.')  
+if (!user[who]?.premiumTime) return m.react('✖️'), m.reply('ꕥ El usuario no es premium.')
+await m.react('🕒')
+user[who].premiumTime = 0
+user[who].premium = false
+await m.react('✔️')
+m.reply(`❀ @${who.split('@')[0]} ya no es usuario premium.`, null, { mentions: [who] })
+break
+}
+case 'listprem': {
+await m.react('🕒')
+const perm = (global.prems || []).map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').filter(v => v !== conn.user.jid)
+const listaPermanentes = perm.map(v => `│ Usuario: @${v.replace(/@.+/, '')}`).join('\n')
+const userList = Object.entries(user).filter(([_, v]) => v.premiumTime).map(([key, value]) => ({ ...value, jid: key }))
+const sorted = userList.sort((a, b) => a.premiumTime - b.premiumTime)
+const len = args[0] ? Math.min(100, Math.max(parseInt(args[0]), 10)) : Math.min(10, sorted.length)
+const listaTemporales = await Promise.all(sorted.slice(0, len).map(async ({ jid, premiumTime }) => {
+return `┌─⊷ \n│ Usuario: @${jid.split('@')[0]}\n│ Expira en: ${premiumTime > 0 ? await formatTime(premiumTime - now) : 'Expirado'}\n└───────────`
+}))
+const textList = `≡ PREMIUM PERMANENTE\n\n❖ Total: ${perm.length}\n┌─⊷\n${listaPermanentes}\n└───────────\n\n≡ USUARIOS PREMIUM\n❖ Total: ${sorted.length} \n${listaTemporales.join('\n')}`
+const mentions = [...perm, ...sorted.slice(0, len).map(({ jid }) => jid)]
+await m.react('✔️')
+conn.reply(m.chat, textList, m, { mentions })
+break
+}}} catch (error) {
+m.reply(`⚠︎ Se ha producido un problema.\n> Usa ${command} report para informarlo.\n\n${error.message}`)
+}}
 
-    who = conn.decodeJid(who);
+handler.help = ['addcoin', 'addxp', 'addprem', 'delprem', 'listprem']
+handler.tags = ['owner']
+handler.command = ['addcoin', 'addxp', 'addprem', 'delprem', 'listprem']
 
-    let txt = text.replace(/@\d{5,}/g, '').trim();
-    if (!txt) return m.reply(`*⚠️ Debes ingresar la cantidad de coins que quieres añadir.*`);
-    if (isNaN(txt)) return m.reply(`*⚠️ La cantidad debe ser un número.*`);
+export default handler
 
-    let amount = parseInt(txt);
-    if (amount < 1) return m.reply(`*⚠️ La cantidad mínima para añadir es 1.*`);
-
-    if (!global.db.data.users[who]) {
-        global.db.data.users[who] = { coin: 0 };
-    }
-
-    global.db.data.users[who].coin = (global.db.data.users[who].coin || 0) + amount;
-
-    await conn.sendMessage(m.chat, {
-        text: `*✅ Transacción exitosa!*\n\n*Cantidad:* ${amount} 💸\n*Para:* @${who.split('@')[0]}`,
-        mentions: [who]
-    }, { quoted: m });
-};
-
-handler.help = ['addcoins <@usuario> <cantidad>'];
-handler.tags = ['owner'];
-handler.command = ['añadircoin', 'addcoin', 'addcoins'];
-handler.rowner = true;
-
-export default handler;
+async function formatTime(ms) {
+let s = Math.floor(ms / 1000), m = Math.floor(s / 60), h = Math.floor(m / 60), d = Math.floor(h / 24)
+let months = Math.floor(d / 30), weeks = Math.floor((d % 30) / 7)
+s %= 60; m %= 60; h %= 24; d %= 7
+let t = months ? [`${months} mes${months > 1 ? 'es' : ''}`] :
+weeks ? [`${weeks} semana${weeks > 1 ? 's' : ''}`] :
+d ? [`${d} día${d > 1 ? 's' : ''}`] : []
+if (h) t.push(`${h} hora${h > 1 ? 's' : ''}`)
+if (m) t.push(`${m} minuto${m > 1 ? 's' : ''}`)
+if (s) t.push(`${s} segundo${s > 1 ? 's' : ''}`)
+return t.length > 1 ? t.slice(0, -1).join(' ') + ' y ' + t.slice(-1) : t[0]
+}
