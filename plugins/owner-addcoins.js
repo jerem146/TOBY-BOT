@@ -21,7 +21,7 @@ const pjkC = Math.ceil(dmt * impts)
 if (dmt + pjkC < 1) return m.react('✖️'), m.reply(`ꕥ Mínimo es *1*`)
 user[who].coin += dmt
 await m.react('✔️')
-m.reply(`❀ *Añadido:*\n» ${dmt} \n@${who.split('@')[0]}, recibiste ${dmt} ${m.moneda}`, null, { mentions: [who] })
+m.reply(`❀ *Añadido:*\n» ${dmt} \n@${who.split('@')[0]}, recibiste ${dmt} ${currency}`, null, { mentions: [who] })
 break
 }
 case 'addxp': {
