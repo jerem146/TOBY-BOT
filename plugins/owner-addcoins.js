@@ -21,7 +21,7 @@ const pjkC = Math.ceil(dmt * impts)
 if (dmt + pjkC < 1) return m.react('✖️'), m.reply(`ꕥ Mínimo es *1*`)
 user[who].coin += dmt
 await m.react('✔️')
-m.reply(`❀ *Añadido:*\n» ${dmt} \n@${who.split('@')[0]}, recibiste ${dmt} ${currency}`, null, { mentions: [who] })
+m.reply(`❀ *Añadido:*\n» ${dmt} \n@${who.split('@')[0]}, recibiste ${dmt} ${m.moneda}`, null, { mentions: [who] })
 break
 }
 case 'addxp': {
@@ -107,3 +107,4 @@ if (m) t.push(`${m} minuto${m > 1 ? 's' : ''}`)
 if (s) t.push(`${s} segundo${s > 1 ? 's' : ''}`)
 return t.length > 1 ? t.slice(0, -1).join(' ') + ' y ' + t.slice(-1) : t[0]
 }
+, 
