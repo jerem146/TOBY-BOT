@@ -1,7 +1,7 @@
 let recipient = global.db.data.users[who]
 let count = Math.min(Number.MAX_SAFE_INTEGER, Math.max(10, (isNumber(args[0]) ? parseInt(args[0]) : 10)))
 if (typeof user.bank !== 'number') user.bank = 0
-if (user.bank < count) return m.reply(`ꕥ No tienes suficientes *${m.moneda}* en el banco para transferir.`)
+if (user.bank < count) return m.reply(`ꕥ No tienes suficientes *${currency}* en el banco para transferir.`)
 user.bank -= count
 if (typeof recipient.bank !== 'number') recipient.bank = 0
 recipient.bank += count   
