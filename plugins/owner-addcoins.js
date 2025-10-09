@@ -1,6 +1,3 @@
-// import db from '../lib/database.js';
-// import MessageType from '@whiskeysockets/baileys';
-
 let handler = async (m, { conn, text }) => {
     let who;
     if (m.isGroup) {
@@ -11,6 +8,8 @@ let handler = async (m, { conn, text }) => {
 
     if (!who) return m.reply(`*⚠️ Por favor, menciona al usuario o responde a su mensaje.*`);
 
+    who = conn.decodeJid(who);
+
     let txt = text.replace(/@\d{5,}/g, '').trim();
     if (!txt) return m.reply(`*⚠️ Debes ingresar la cantidad de coins que quieres añadir.*`);
     if (isNaN(txt)) return m.reply(`*⚠️ La cantidad debe ser un número.*`);
@@ -19,9 +18,7 @@ let handler = async (m, { conn, text }) => {
     if (amount < 1) return m.reply(`*⚠️ La cantidad mínima para añadir es 1.*`);
 
     if (!global.db.data.users[who]) {
-        global.db.data.users[who] = {
-            coin: 0,
-        };
+        global.db.data.users[who] = { coin: 0 };
     }
 
     global.db.data.users[who].coin = (global.db.data.users[who].coin || 0) + amount;
