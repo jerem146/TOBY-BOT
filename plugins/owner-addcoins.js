@@ -1,12 +1,15 @@
 let handler = async (m, { conn, text }) => {
     let who;
-    if (m.isGroup) {
-        who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : null;
-    } else {
-        who = m.chat;
-    }
 
-    if (!who) return m.reply(`*⚠️ Por favor, menciona al usuario o responde a su mensaje.*`);
+    if (m.quoted) {
+        who = m.quoted.sender;
+    } 
+    else if (m.mentionedJid && m.mentionedJid[0]) {
+        who = m.mentionedJid[0];
+    } 
+    else {
+        return m.reply(`*⚠️ Debes responder al mensaje de un usuario o mencionarlo para añadirle coins.*`);
+    }
 
     who = conn.decodeJid(who);
 
