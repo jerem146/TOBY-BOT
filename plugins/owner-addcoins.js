@@ -8,6 +8,7 @@ const now = Date.now()
 const user = global.db.data.users
 let mentionedJid = await m.mentionedJid
 let who = mentionedJid && mentionedJid.length ? mentionedJid[0] : m.quoted && await m.quoted.sender ? await m.quoted.sender : null
+const currency = '💰 Monedas'
 switch (command) {
 case 'addcoin': {
 if (!who) return m.reply('❀ Por favor, menciona al usuario o cita un mensaje.')
@@ -107,4 +108,3 @@ if (m) t.push(`${m} minuto${m > 1 ? 's' : ''}`)
 if (s) t.push(`${s} segundo${s > 1 ? 's' : ''}`)
 return t.length > 1 ? t.slice(0, -1).join(' ') + ' y ' + t.slice(-1) : t[0]
 }
-, 
