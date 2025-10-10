@@ -10,7 +10,7 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
   if (!args[0]) {
     return conn.reply(
       m.chat,
-      `${emoji} 𝐏𝐨𝐫 𝐟𝐚𝐯𝐨𝐫, 𝐢𝐧𝐠𝐫𝐞𝐬𝐚 𝐮𝐧 𝐞𝐧𝐥𝐚𝐜𝐞 𝐝𝐞 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤.\n\nEjemplo:\n> *${usedPrefix + command} https://www.facebook.com/...*`,
+      `${emoji} 𝐏𝐨𝐫 𝐟𝐚𝐯𝐨𝐫, 𝐢𝐧𝐠𝐫𝐞𝐬𝐚 𝐮𝐧 𝐞𝐧𝐥𝐚𝐜𝐞 𝐝𝐞 𝐅𝐚𝐜𝐞𝐛𝐨𝐨𝐤 🌐\n\n✨ Ejemplo:\n> *${usedPrefix + command} https://www.facebook.com/...*`,
       m
     )
   }
@@ -24,22 +24,23 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
 
     if (!json.status || !json.download) {
       await m.react('⚠️')
-      return conn.reply(m.chat, `${emoji2} No se pudo obtener el video, verifica el enlace.`, m)
+      return conn.reply(m.chat, `${emoji2} No se pudo obtener el video, verifica el enlace por favor >w<`, m)
     }
 
     const { title, description, siteName } = json.metadata
     const videoUrl = json.download
 
     const caption = `
-ㅤֺㅤ۪ㅤ   ׄ  ＼ㅤ｜ㅤ／  ׄ  ㅤִㅤ۫ 
-        ⁔᷼︵⵿۪۪۪۪۪۪⋂⵿۪۪۪۪۪⏜⵿۪۪۪۪︠᎔⵿︡︵۪۪۪۪۪᷼⋱ּ͡ ٜ＼᳣۪۪۪͜ᮬ 🥽᳤ ۪۪۪͜／ٜᮬ ּ͡⋰۪۪۪۪۪᷼︵⵿۪۪۪︠᎔⵿︡⏜⵿۪۪۪۪۪⋂⵿۪۪۪۪۪۪︵᷼⁔  
-🩵⃞ ✿      𝙍𝙐𝘽𝙔-𝘽𝙊𝙏 𝘿𝙀𝙎𝘾𝘼𝙍𝙂𝘼𝙎ㅤ𐙚
-                  ︶ᰰ࿙۪۪ٜ۪۪۪ٜ͝࿚⏝ᰰ࿙۪ٜ۪۪ٜ︧͝࿚︧❀︨࿙۪ٜ۪۪ٜ︨͝࿚⏝ᰰ࿙۪۪ٜ۪۪۪ٜ͝࿚︶ᰰ
-> ꜒📺ᮀ࠘࿑  *\`𝐓𝐈𝐓𝐔𝐋𝐎`\:* ${title ? title : 'Sin título'}
-> ꜒📝ᮀ࠘࿑  *\`𝐃𝐄𝐒𝐂𝐑𝐈𝐏𝐂𝐈𝐎́𝐍`\:* ${description ? description : 'Sin descripción'}
-> ꜒🌐ᮀ࠘࿑  *\`𝐎𝐑𝐈𝐆𝐄𝐍`\:* ${siteName ? siteName : 'Facebook'}
-> ꜒👩🏻‍💻ᮀ࠘࿑  *\`𝐀𝐏𝐈`\:* Ruby Core by Dioneibi
-             ︶ּ⏝ׅ︶ ౨ৎ ︶ׁׅ⏝ּ︶
+ㅤֺㅤ۪ㅤ   ׄ  ＼ㅤ｜ㅤ／  ׄ  ㅤִㅤ۫ 
+⁔᷼︵⵿۪۪۪۪۪۪⋂⵿۪۪۪۪۪⏜⵿۪۪۪۪︠᎔⵿︡︵۪۪۪۪۪᷼⋱ּ͡ ٜ＼᳣۪۪۪͜ᮬ 🥽᳤ ۪۪۪͜／ٜᮬ ּ͡⋰۪۪۪۪۪᷼︵⵿۪۪۪︠᎔⵿︡⏜⵿۪۪۪۪۪⋂⵿۪۪۪۪۪۪︵᷼⁔  
+🩵⃞ ✿  𝑹𝑼𝑩𝒀-𝑩𝑶𝑻 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 𐙚
+︶ᰰ࿙۪۪ٜ۪۪۪ٜ͝࿚⏝ᰰ࿙۪ٜ۪۪ٜ︧͝࿚︧❀︨࿙۪ٜ۪۪ٜ︨͝࿚⏝ᰰ࿙۪۪ٜ۪۪۪ٜ͝࿚︶ᰰ
+
+> ꜒📺ᮀ࠘࿑  *\`𝐓𝐈𝐓𝐔𝐋𝐎\`*: ${title || 'Sin título'}
+> ꜒📝ᮀ࠘࿑  *\`𝐃𝐄𝐒𝐂𝐑𝐈𝐏𝐂𝐈𝐎́𝐍\`*: ${description || 'Sin descripción'}
+> ꜒🌐ᮀ࠘࿑  *\`𝐎𝐑𝐈𝐆𝐄𝐍\`*: ${siteName || 'Facebook'}
+> ꜒👩🏻‍💻ᮀ࠘࿑  *\`𝐀𝐏𝐈\`*: Ruby Core by Dioneibi
+╰┈➤ *Hai~! 💕 Aquí tienes tu video listo, Onee-san~!* 🍰
 `.trim()
 
     await conn.sendMessage(
@@ -52,7 +53,7 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
         contextInfo: {
           externalAdReply: {
             title: '🌸 Ruby Hoshino Downloader 🌸',
-            body: 'Descarga directa desde Facebook',
+            body: 'Descarga directa desde Facebook 💕',
             thumbnailUrl: 'https://telegra.ph/file/95c0cc90d069fea2cdf0d.png',
             sourceUrl: 'https://ruby-core.vercel.app/',
             mediaType: 1,
@@ -67,7 +68,7 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
   } catch (e) {
     console.error(e)
     await m.react('⚠️')
-    return conn.reply(m.chat, `${msm} Error al procesar el video.`, m)
+    return conn.reply(m.chat, `${msm} Hubo un error al procesar el video >_<`, m)
   }
 }
 
