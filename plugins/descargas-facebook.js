@@ -33,8 +33,6 @@ const handler = async (m, { text, conn, args, usedPrefix, command }) => {
     const caption = `
 ㅤֺㅤ۪ㅤ   ׄ  ＼ㅤ｜ㅤ／  ׄ  ㅤִㅤ۫ 
 ⁔᷼︵⵿۪۪۪۪۪۪⋂⵿۪۪۪۪۪⏜⵿۪۪۪۪︠᎔⵿︡︵۪۪۪۪۪᷼⋱ּ͡ ٜ＼᳣۪۪۪͜ᮬ 🥽᳤ ۪۪۪͜／ٜᮬ ּ͡⋰۪۪۪۪۪᷼︵⵿۪۪۪︠᎔⵿︡⏜⵿۪۪۪۪۪⋂⵿۪۪۪۪۪۪︵᷼⁔  
-🩵⃞ ✿  𝑹𝑼𝑩𝒀-𝑩𝑶𝑻 𝐃𝐄𝐒𝐂𝐀𝐑𝐆𝐀𝐒 𐙚
-
 > ꜒📺ᮀ࠘࿑  *\`𝐓𝐈𝐓𝐔𝐋𝐎\`*: ${title || 'Sin título'}
 > ꜒📝ᮀ࠘࿑  *\`𝐃𝐄𝐒𝐂𝐑𝐈𝐏𝐂𝐈𝐎́𝐍\`*: ${description || 'Sin descripción'}
 > ꜒🌐ᮀ࠘࿑  *\`𝐎𝐑𝐈𝐆𝐄𝐍\`*: ${siteName || 'Facebook'}
