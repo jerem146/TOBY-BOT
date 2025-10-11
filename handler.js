@@ -26,11 +26,13 @@ if (!m)
 return;
 if (global.db.data == null)
 await global.loadDatabase()
-let sender;
+
 try {
 m = smsg(this, m) || m
 if (!m)
 return
+
+const sender = m.sender;
 
 if (m.isGroup) {
     const chat = global.db.data.chats[m.chat];
@@ -45,7 +47,6 @@ if (m.isGroup) {
         }
     }
 }
-sender = m.isGroup ? (m.key.participant ? m.key.participant : m.sender) : m.key.remoteJid;
 
 m.exp = 0
 m.coin = false
