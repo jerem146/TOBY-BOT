@@ -129,24 +129,6 @@ version: version,
 generateHighQualityLinkPreview: true
 };
 
-/*const connectionOptions = {
-printQRInTerminal: false,
-logger: pino({ level: 'silent' }),
-auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, pino({level: 'silent'})) },
-msgRetry,
-msgRetryCache,
-version: [2, 3000, 1015901307],
-syncFullHistory: true,
-browser: mcode ? ['Ubuntu', 'Chrome', '110.0.5585.95'] : ['Ruby Hoshino Bot (Sub Bot)', 'Chrome','2.0.0'],
-defaultQueryTimeoutMs: undefined,
-getMessage: async (key) => {
-if (store) {
-//const msg = store.loadMessage(key.remoteJid, key.id)
-//return msg.message && undefined
-} return {
-conversation: 'Ruby Hoshino Bott',
-}}}*/
-
 let sock = makeWASocket(connectionOptions)
 sock.isInit = false
 let isInit = true
@@ -168,8 +150,11 @@ return
 if (qr && mcode) {
 let secret = await sock.requestPairingCode((m.sender.split`@`[0]))
 secret = secret.match(/.{1,4}/g)?.join("-")
-txtCode = await conn.sendMessage(m.chat, {text : rtx2}, { quoted: m })
-codeBot = await conn.sendMessage(m.chat, { image: { url: 'https://files.catbox.moe/9k5x8y.jpg' }, caption: `*${secret}*` }, { quoted: m });
+
+txtCode = await conn.sendMessage(m.chat, { image: { url: 'https://files.catbox.moe/9k5x8y.jpg' }, caption: rtx2 }, { quoted: m });
+
+codeBot = await m.reply(secret);
+
 console.log(secret)
 }
 if (txtCode && txtCode.key) {
