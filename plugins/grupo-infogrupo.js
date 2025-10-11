@@ -22,7 +22,7 @@ ${listAdmin}
 
 ◈ *Welcome:* ${welcome ? '✅' : ''}
 ◈ *Detect:* ${detect ? '✅' : '❌'}  
-◈ *Antilink:* ${antiLink ? '✅' : '❌'} 
+◈ *:* ${antiLink ? '✅' : '❌'} 
 ◈ *Autoaceptar:* ${autoAceptar ? '✅' : '❌'} 
 ◈ *Autorechazar:* ${autoRechazar ? '✅' : '❌'} 
 ◈ *Nfsw:* ${nsfw ? '✅' : '❌'} 
@@ -32,7 +32,7 @@ ${listAdmin}
 ◈ *Reacción* ${reaction ? "✅️" : "❌️"}
 ◈ *Antispam:* ${antiSpam ? '✅' : '❌'} 
 ◈ *Restrict:* ${restrict ? '✅' : '❌'} 
-◈ *Antitoxic:* ${antiToxic ? '✅' : '❌'} 
+◈ *:* ${antiToxic ? '✅' : '❌'} 
 ◈ *Antitraba:* ${antiTraba ? '✅' : '❌'} 
 `.trim();
   conn.sendFile(m.chat, pp, 'img.jpg', text, m, false, {mentions: [...groupAdmins.map((v) => v.id), owner]});
@@ -44,4 +44,3 @@ handler.register = true
 handler.group = true;
 
 export default handler;
-
