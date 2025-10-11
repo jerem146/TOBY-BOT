@@ -1,43 +1,44 @@
-async function handler(m, { conn, args, usedPrefix, command }) {
+let handler = async (m, { conn, args, usedPrefix, command }) => {
+    const currency = '💎';
 
     let mentionedJid = m.mentionedJid || [];
     const who = m.quoted 
         ? m.quoted.sender 
         : (mentionedJid[0] || (args[1] ? (args[1].replace(/[@ .+-]/g, '') + '@s.whatsapp.net') : ''));
 
-    if (!args[0]) return m.reply(`❀ Debes mencionar a quien quieras regalar *${currency}*.\n> Ejemplo » *${usedPrefix + command} 25000 @mencion*`);
+    if (!args[0]) 
+        return conn.reply(m.chat, `❀ Debes mencionar a quien quieras regalar *${currency}*.\n> Ejemplo » *${usedPrefix + command} 25000 @mencion*`, m);
+
     if (!isNumber(args[0]) && args[0].startsWith('@')) 
-        return m.reply(`ꕥ Primero indica la cantidad que deseas transferir, seguido de la persona a quien se lo envías.\nEjemplo: *${usedPrefix + command} 1000 @mencion*`);
-    if (!who) return m.reply(`ꕥ Debes mencionar a alguien para transferir *${currency}*.`);
-    if (!(who in global.db.data.users)) return m.reply(`ꕥ El usuario no está en la base de datos.`);
+        return conn.reply(m.chat, `ꕥ Primero indica la cantidad que deseas transferir, seguido de la persona.\n> Ejemplo » *${usedPrefix + command} 1000 @mencion*`, m);
+
+    if (!who) 
+        return conn.reply(m.chat, `ꕥ Debes mencionar a alguien para transferir *${currency}*.`, m);
+
+    if (!(who in global.db.data.users)) 
+        return conn.reply(m.chat, `ꕥ El usuario no está en la base de datos.`, m);
 
     let user = global.db.data.users[m.sender];
     let recipient = global.db.data.users[who];
-
     let count = Math.min(Number.MAX_SAFE_INTEGER, Math.max(10, (isNumber(args[0]) ? parseInt(args[0]) : 10)));
 
-    // Inicialización de cuentas si no existen
     if (typeof user.bank !== 'number') user.bank = 0;
     if (typeof recipient.bank !== 'number') recipient.bank = 0;
 
-    if (user.bank < count) return m.reply(`ꕥ No tienes suficientes *${currency}* en el banco para transferir.`);
+    if (user.bank < count) 
+        return conn.reply(m.chat, `ꕥ No tienes suficientes *${currency}* en el banco para transferir.`, m);
 
     user.bank -= count;
     recipient.bank += count;
 
-    if (isNaN(user.bank)) user.bank = 0;
+    let name = await conn.getName(who).catch(() => who.split('@')[0]);
+    let name2 = await conn.getName(m.sender).catch(() => m.sender.split('@')[0]);
 
-    let name = await (async () => {
-        try {
-            const n = await conn.getName(who);
-            return typeof n === 'string' && n.trim() ? n : who.split('@')[0];
-        } catch {
-            return who.split('@')[0];
-        }
-    })();
+    m.react('💸');
 
-    m.reply(`❀ Transferiste *¥${count.toLocaleString()} ${currency}* a *${name}*\n> Ahora tienes *¥${user.bank.toLocaleString()} ${currency}* en total en el banco.`, null, { mentions: [who] });
-}
+    let mensaje = `❀ ${name2} transferiste *${count.toLocaleString()} ${currency}* a ${name}\n> Ahora tienes *${user.bank.toLocaleString()} ${currency}* en tu banco.`;
+    await conn.reply(m.chat, mensaje, m, { mentions: [who] });
+};
 
 handler.help = ['pay'];
 handler.tags = ['rpg'];
