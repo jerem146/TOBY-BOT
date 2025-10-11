@@ -141,6 +141,20 @@ if (typeof nuevo === "string" && nuevo.trim() && nuevo !== actual) {
 _user.name = nuevo
 }} catch {}
 
+if (m.isGroup) {
+    const chat = global.db.data.chats[m.chat];
+    if (chat?.primaryBot) {
+        const universalWords = ['resetbot', 'resetprimario', 'botreset'];
+        const firstWord = m.text ? m.text.trim().split(' ')[0].toLowerCase().replace(/^[./#]/, '') : '';
+
+        if (!universalWords.includes(firstWord)) {
+            if (this?.user?.jid !== chat.primaryBot) {
+                return;
+            }
+        }
+    }
+}
+
 const groupMetadata = m.isGroup ? { ...(this.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}), ...(((this.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants) && { participants: ((this.chats[m.chat]?.metadata || await this.groupMetadata(m.chat).catch(_ => null) || {}).participants || []).map(p => ({ ...p, id: p.jid, jid: p.jid, lid: p.lid })) }) } : {}
 const participants = ((m.isGroup ? groupMetadata.participants : []) || []).map(participant => ({ id: participant.jid, jid: participant.jid, lid: participant.lid, admin: participant.admin }))
 const userGroup = (m.isGroup ? participants.find((u) => this.decodeJid(u.jid) === m.sender) : {}) || {}
