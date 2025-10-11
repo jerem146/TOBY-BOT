@@ -31,14 +31,23 @@ let crm4 = "IF9hdXRvcmVzcG9uZGVyLmpzIGluZm8tYm90Lmpz"
 let drm1 = ""
 let drm2 = ""
 let rtx = "*\n\n✐ Cσɳҽxισɳ SυႦ-Bσƚ Mσԃҽ QR\n\n✰ Con otro celular o en la PC escanea este QR para convertirte en un *Sub-Bot* Temporal.\n\n\`1\` » Haga clic en los tres puntos en la esquina superior derecha\n\n\`2\` » Toque dispositivos vinculados\n\n\`3\` » Escanee este codigo QR para iniciar sesion con el bot\n\n✧ ¡Este código QR expira en 45 segundos!."
-let rtx2 = `✐ Cσɳҽxισɳ SυႦ-Bσƚ Mσԃҽ Cσԃҽ\n
-✰ Usa este Código para convertirte en un *Sub-Bot* Temporal.\n
-\`1\` » Haga clic en los tres puntos en la esquina superior derecha\n
-\`2\` » Toque dispositivos vinculados\n
-\`3\` » Selecciona Vincular con el número de teléfono\n
-\`4\` » Escriba el Código para iniciar sesion con el bot\n
-✧ No es recomendable usar tu cuenta principal.\n
-`
+let rtx2 = `╭━╴╶╴╶╴╶╴𖣘╶╴╶╴╶╴╶━╮
+│🩵 S E R B O T - S U B B O T 🩵
+├╶╴╶╴╶╴╶╴╶╴╶╴╶╴╶╴╶╴╶╴
+│ (*ᴗ͈ˬᴗ͈)ꕤ  𝐔𝐬𝐚 𝐞𝐬𝐭𝐞 𝐂𝐨𝐝𝐢𝐠𝐨 𝐏𝐚𝐫𝐚 𝐒𝐞𝐫 𝐒𝐮𝐛 𝐁𝐨𝐭
+├╶╴╶╴╶╴╶╴╶╴╶╴╶╴╶╴╶╴
+│💎 𝐏𝐚𝐬𝐨𝐬:
+├╶╴╶╴╶╴╶╴╶╴╶╴╶╴╶╴
+│🏟️⃟̶̸̷┆ \`1\` : 𝐇𝐚𝐠𝐚 𝐜𝐥𝐢𝐜𝐤 𝐞𝐧 𝐥𝐨𝐬 3 𝐩𝐮𝐧𝐭𝐨𝐬 𝐝𝐞 𝐥𝐚 𝐞𝐬𝐪𝐮𝐢𝐧𝐚 𝐝𝐞𝐫𝐞𝐜𝐡𝐚
+├╶╴╶╴╶╴╶╴╶╴╶╴
+│🏟️⃟̶̸̷┆ \`2\` : 𝐓𝐞 𝐝𝐢𝐬𝐩𝐨𝐬𝐢𝐭𝐢𝐯𝐨𝐬 𝐕𝐢𝐧𝐜𝐮𝐥𝐚𝐝𝐨𝐬
+├╶╴╶╴╶╴╶╴╶╴╶╴
+│🏟️⃟̶̸̷┆ \`3\` : 𝐒𝐞𝐥𝐞𝐜𝐜𝐢𝐨𝐧𝐚 𝐕𝐢𝐧𝐜𝐮𝐥𝐚𝐫 𝐜𝐨𝐧 𝐄𝐥 𝐧𝐮𝐦𝐞𝐫𝐨 𝐃𝐞 𝐭𝐞𝐥𝐞𝐟𝐨𝐧𝐨
+├╶╴╶╴╶╴╶╴╶╴╶╴
+│🏟️⃟̶̸̷┆ \`4\` : 𝐏𝐞𝐠𝐚 𝐞𝐥 𝐜𝐨𝐝𝐢𝐠𝐨 𝐞𝐧𝐯𝐢𝐚𝐝𝐨
+├╶╴╶╴╶╴╶╴╶╴╶╴
+> *𝑵𝒐𝒕𝒂:* 𝑬𝒔𝒕𝒆 𝑪𝒐𝒅𝒊𝒈𝒐 𝒔𝒐𝒍𝒐 𝒇𝒖𝒏𝒄𝒊𝒐𝒏𝒂 𝒆𝒏 𝒆𝒍 𝒏𝒖𝒎𝒆𝒓𝒐 𝒒𝒖𝒆 𝒍𝒐 𝒔𝒐𝒍𝒊𝒄𝒊𝒕𝒐.
+*╰━╴╶╴╶╴╶╴𖣘╶╴╶╴╶╴╶━╯*`
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -159,12 +168,8 @@ return
 if (qr && mcode) {
 let secret = await sock.requestPairingCode((m.sender.split`@`[0]))
 secret = secret.match(/.{1,4}/g)?.join("-")
-//if (m.isWABusiness) {
 txtCode = await conn.sendMessage(m.chat, {text : rtx2}, { quoted: m })
-codeBot = await m.reply(secret)
-//} else {
-//txtCode = await conn.sendButton(m.chat, rtx2.trim(), wm, null, [], secret, null, m) 
-//}
+codeBot = await conn.sendMessage(m.chat, { image: { url: 'https://files.catbox.moe/9k5x8y.jpg' }, caption: `*${secret}*` }, { quoted: m });
 console.log(secret)
 }
 if (txtCode && txtCode.key) {
