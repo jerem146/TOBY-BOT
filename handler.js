@@ -235,7 +235,7 @@ m.plugin = name
 
 let chat = global.db.data.chats[m.chat] || {};
 const isBotBannedInThisChat = chat.bannedBots && chat.bannedBots.includes(this.user.jid);
-const unbanCommandFiles = ['jadibot-unbanchat.js'];
+const unbanCommandFiles = ['grupo-unbanchat.js'];
 
 if (isBotBannedInThisChat && !unbanCommandFiles.includes(name)) {
 return;
