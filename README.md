@@ -133,7 +133,7 @@ cd Ruby-Hoshino-Bot
 ```
 
 ```bash
-rm -rf RubySession
+rm -rf RubySessions
 ```
 
 ```bash
