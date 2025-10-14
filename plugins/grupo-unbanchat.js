@@ -1,4 +1,8 @@
 let handler = async (m, { conn, isROwner }) => {
+    if (!isROwner && m.sender !== conn.user.jid) {
+        throw `Este comando solo puede ser utilizado por el creador o el mismo bot.`;
+    }
+
 
     let chat = global.db.data.chats[m.chat];
     if (!chat || !chat.bannedBots) {
@@ -20,6 +24,5 @@ handler.help = ['unbanchat'];
 handler.tags = ['owner'];
 handler.command = ['unbanchat', 'desbanearchat'];
 handler.group = true;
-handler.rowner = true;
 
 export default handler;
