@@ -152,7 +152,7 @@ Un agradecimiento especial a todos los que han hecho posible este proyecto.
 \</tr\>
 \<tr\>
 \<td align="center" colspan="2"\>
-\<p\>\<b\>Colaboradores Especiales\</p\>
+\<p\>\<b\>Colaboradores Especiales\</b\>\</p\>
 \</td\>
 \</tr\>
 \<tr\>
