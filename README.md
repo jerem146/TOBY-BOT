@@ -1,3 +1,4 @@
+
 <div align="center">
   <img src="https://i.imgur.com/u4sYHGA.png" alt="Ruby Hoshino Banner" width="600"/>
   <h1>🌸 Ruby Hoshino Bot 🌸</h1>
@@ -175,6 +176,3 @@ Un agradecimiento especial a todos los que han hecho posible este proyecto.
 
 > [\!IMPORTANT]
 > **Aviso Legal:** Este proyecto es de código abierto y fue creado con fines educativos y de desarrollo. No está afiliado de ninguna manera con WhatsApp o Meta. El uso comercial o con fines maliciosos está estrictamente prohibido.
-
-```
-```
