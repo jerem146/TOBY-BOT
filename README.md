@@ -1,4 +1,3 @@
-
 <div align="center">
   <img src="https://i.imgur.com/u4sYHGA.png" alt="Ruby Hoshino Banner" width="600"/>
   <h1>🌸 Ruby Hoshino Bot 🌸</h1>
