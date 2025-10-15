@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 export async function before(m, { conn, participants, groupMetadata }) {
   if (!m.isGroup || !m.messageStubType) return true;
 
+  const redes = 'https://github.com/Dioneibi-rip';
   const fkontak = {
     key: {
       participants: "0@s.whatsapp.net",
@@ -75,7 +76,9 @@ Soy *Ruby Hoshino*, la asistente de este increíble grupo. Espero que tu estanci
       .replace('@subject', groupMetadata.subject)
       .replace('@desc', groupMetadata.desc?.toString() || 'Sin descripción');
 
-    const fullCaption = `*${txtWelcome}*\n\n${bienvenida}`;
+    const footer = `\n\n— Creador: ${dev}\n— Repositorio: ${redes}`;
+    const fullCaption = `*${txtWelcome}*\n\n${bienvenida}${footer}`;
+
     const welcomeApiUrl = `${apiBase}/welcomev2?username=${username}&guildName=${guildName}&memberCount=${memberCount}&avatar=${encodeURIComponent(avatar)}&background=${backgroundUrl}`;
     let imgBuffer = await fetchImage(welcomeApiUrl);
 
@@ -99,7 +102,9 @@ Te extrañaremos en @subject. Esperamos que vuelvas pronto. 👋
       .replace('@user', mention)
       .replace('@subject', groupMetadata.subject);
     
-    const fullCaption = `*${txtGoodbye}*\n\n${despedida}`;
+    const footer = `\n\n— Creador: ${dev}\n— Repositorio: ${redes}`;
+    const fullCaption = `*${txtGoodbye}*\n\n${despedida}${footer}`;
+
     const goodbyeApiUrl = `${apiBase}/goodbyev2?username=${username}&guildName=${guildName}&memberCount=${memberCount}&avatar=${encodeURIComponent(avatar)}&background=${backgroundUrl}`;
     let imgBuffer = await fetchImage(goodbyeApiUrl);
     
