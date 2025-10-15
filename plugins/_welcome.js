@@ -75,13 +75,20 @@ Soy *Ruby Hoshino*, la asistente de este increíble grupo. Espero que tu estanci
       .replace('@subject', groupMetadata.subject)
       .replace('@desc', groupMetadata.desc?.toString() || 'Sin descripción');
 
+    const footer = `\n─────────────\n> Creador: ${dev}`;
+    const fullCaption = `${txtWelcome}\n\n${bienvenida}${footer}`;
+
     const welcomeApiUrl = `${apiBase}/welcomev2?username=${username}&guildName=${guildName}&memberCount=${memberCount}&avatar=${encodeURIComponent(avatar)}&background=${backgroundUrl}`;
     let imgBuffer = await fetchImage(welcomeApiUrl);
 
-    await conn.sendMini(m.chat, txtWelcome, dev, bienvenida, imgBuffer, imgBuffer, redes, fkontak);
+    await conn.sendMessage(m.chat, { 
+        image: imgBuffer, 
+        caption: fullCaption, 
+        mentions: [userJid]
+    }, { quoted: fkontak });
 
   } else if (m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_LEAVE || m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_REMOVE) {
-    const memberCount = initialMemberCount - 1;
+    const memberCount = initialMemberCount;
     
     const txtGoodbye = `💔 Un miembro se ha ido 💔`;
     const defaultBye = `*Adiós, @user...*
@@ -93,11 +100,18 @@ Te extrañaremos en @subject. Esperamos que vuelvas pronto. 👋
     const despedida = (chat.byeText || defaultBye)
       .replace('@user', mention)
       .replace('@subject', groupMetadata.subject);
+
+    const footer = `\n─────────────\n> Creador: ${dev}`;
+    const fullCaption = `${txtGoodbye}\n\n${despedida}${footer}`;
     
     const goodbyeApiUrl = `${apiBase}/goodbyev2?username=${username}&guildName=${guildName}&memberCount=${memberCount}&avatar=${encodeURIComponent(avatar)}&background=${backgroundUrl}`;
     let imgBuffer = await fetchImage(goodbyeApiUrl);
     
-    await conn.sendMini(m.chat, txtGoodbye, dev, despedida, imgBuffer, imgBuffer, redes, fkontak);
+    await conn.sendMessage(m.chat, { 
+        image: imgBuffer, 
+        caption: fullCaption, 
+        mentions: [userJid]
+    }, { quoted: fkontak });
   }
 
   return true;
