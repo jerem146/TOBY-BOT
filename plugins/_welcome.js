@@ -57,10 +57,10 @@ export async function before(m, { conn, participants, groupMetadata }) {
 
   
   if (m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_ADD || m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_INVITE) {
-    const memberCount = initialMemberCount; // El conteo actual ya incluye al nuevo miembro.
+    const memberCount = initialMemberCount;
     
     const txtWelcome = `🌸 ¡Nuevo miembro! 🌸`;
-    const bienvenida = `*¡Hola, ${mention}! Te damos la bienvenida a ${groupMetadata.subject}.*
+    const defaultWelcome = `*¡Hola, @user! Te damos la bienvenida a @subject.*
 
 Soy *Ruby Hoshino*, la asistente de este increíble grupo. Espero que tu estancia aquí sea fantástica. ✨
 
@@ -69,27 +69,47 @@ Soy *Ruby Hoshino*, la asistente de este increíble grupo. Espero que tu estanci
 > 🤖 Escribe *#menu* para ver todo lo que puedo hacer.
 
 ¡Disfruta de la comunidad!`;
+    
+    const bienvenida = (chat.welcomeText || defaultWelcome)
+      .replace('@user', mention)
+      .replace('@subject', groupMetadata.subject)
+      .replace('@desc', groupMetadata.desc?.toString() || 'Sin descripción');
 
+    const fullCaption = `*${txtWelcome}*\n\n${bienvenida}`;
     const welcomeApiUrl = `${apiBase}/welcomev2?username=${username}&guildName=${guildName}&memberCount=${memberCount}&avatar=${encodeURIComponent(avatar)}&background=${backgroundUrl}`;
     let imgBuffer = await fetchImage(welcomeApiUrl);
 
-    await conn.sendMini(m.chat, txtWelcome, dev, bienvenida, imgBuffer, imgBuffer, redes, fkontak);
+    await conn.sendMessage(m.chat, { 
+        image: imgBuffer, 
+        caption: fullCaption, 
+        mentions: [userJid]
+    }, { quoted: fkontak });
 
   } else if (m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_LEAVE || m.messageStubType === WAMessageStubType.GROUP_PARTICIPANT_REMOVE) {
-    const memberCount = initialMemberCount; 
+    const memberCount = initialMemberCount - 1;
     
     const txtGoodbye = `💔 Un miembro se ha ido 💔`;
-    const despedida = `*Adiós, ${mention}...*
+    const defaultBye = `*Adiós, @user...*
 
-Te extrañaremos en ${groupMetadata.subject}. Esperamos que vuelvas pronto. 👋
+Te extrañaremos en @subject. Esperamos que vuelvas pronto. 👋
 
 > 📉 Ahora quedamos ${memberCount} miembros en el grupo.`;
 
+    const despedida = (chat.byeText || defaultBye)
+      .replace('@user', mention)
+      .replace('@subject', groupMetadata.subject);
+    
+    const fullCaption = `*${txtGoodbye}*\n\n${despedida}`;
     const goodbyeApiUrl = `${apiBase}/goodbyev2?username=${username}&guildName=${guildName}&memberCount=${memberCount}&avatar=${encodeURIComponent(avatar)}&background=${backgroundUrl}`;
     let imgBuffer = await fetchImage(goodbyeApiUrl);
-
-    await conn.sendMini(m.chat, txtGoodbye, dev, despedida, imgBuffer, imgBuffer, redes, fkontak);
+    
+    await conn.sendMessage(m.chat, { 
+        image: imgBuffer, 
+        caption: fullCaption, 
+        mentions: [userJid]
+    }, { quoted: fkontak });
   }
 
   return true;
 }
+
