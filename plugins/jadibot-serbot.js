@@ -11,7 +11,7 @@ Contenido adaptado por:
 - elrebelde21 >> https://github.com/elrebelde21
 */
 
-const { useMultiFileAuthState, DisconnectReason, makeCacheableSignalKeyStore, fetchLatestBaileysVersion} = (await import("@whiskeysockets/baileys"));
+import baileys, { useMultiFileAuthState, DisconnectReason, makeCacheableSignalKeyStore, fetchLatestBaileysVersion, generateWAMessageFromContent, proto } from "@whiskeysockets/baileys";
 import qrcode from "qrcode"
 import NodeCache from "node-cache"
 import fs from "fs"
@@ -95,7 +95,7 @@ if (command === 'code') {
 command = 'qr'; 
 args.unshift('code')}
 const mcode = args[0] && /(--code|code)/.test(args[0].trim()) ? true : args[1] && /(--code|code)/.test(args[1].trim()) ? true : false
-let txtCode, codeBot, txtQR
+let codeBot, txtQR
 if (mcode) {
 args[0] = args[0].replace(/^--code$|^code$/, "").trim()
 if (args[1]) args[1] = args[1].replace(/^--code$|^code$/, "").trim()
@@ -149,22 +149,44 @@ setTimeout(() => { conn.sendMessage(m.sender, { delete: txtQR.key })}, 45000)
 }
 return
 } 
+
 if (qr && mcode) {
-let secret = await sock.requestPairingCode((m.sender.split`@`[0]))
-secret = secret.match(/.{1,4}/g)?.join("-")
+    let secret = await sock.requestPairingCode((m.sender.split`@`[0]))
+    secret = secret.match(/.{1,4}/g)?.join("-")
+    
+    const msg = generateWAMessageFromContent(m.chat, baileys.proto.Message.fromObject({
+        interactiveMessage: {
+            header: {
+                title: "✨ CÓDIGO DE VINCULACIÓN ✨",
+                hasMediaAttachment: true,
+                imageMessage: {
+                    url: 'https://qu.ax/ETEVV.jpeg'
+                }
+            },
+            body: {
+                text: rtx2
+            },
+            nativeFlowMessage: {
+                buttons: [
+                    {
+                        name: 'cta_copy',
+                        buttonParamsJson: JSON.stringify({
+                            display_text: `copiar codigo`,
+                            copy_code: secret
+                        })
+                    }
+                ]
+            }
+        }
+    }), { userJid: m.sender, quoted: m });
 
-txtCode = await conn.sendMessage(m.chat, { image: { url: 'https://qu.ax/ETEVV.jpeg' }, caption: rtx2 }, { quoted: m });
+    codeBot = await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
 
-codeBot = await m.reply(secret);
+    if (codeBot && codeBot.key) {
+        setTimeout(() => { conn.sendMessage(m.sender, { delete: codeBot })}, 45000)
+    }
+}
 
-console.log(secret)
-}
-if (txtCode && txtCode.key) {
-setTimeout(() => { conn.sendMessage(m.sender, { delete: txtCode.key })}, 45000)
-}
-if (codeBot && codeBot.key) {
-setTimeout(() => { conn.sendMessage(m.sender, { delete: codeBot.key })}, 45000)
-}
 const endSesion = async (loaded) => {
 if (!loaded) {
 try {
@@ -295,3 +317,4 @@ async function joinChannels(conn) {
 for (const channelId of Object.values(global.ch)) {
 await conn.newsletterFollow(channelId).catch(() => {})
 }}
+```
