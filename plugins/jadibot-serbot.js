@@ -154,8 +154,19 @@ if (qr && mcode) {
 let secret = await sock.requestPairingCode((m.sender.split`@`[0]))
 secret = secret.match(/.{1,4}/g)?.join("-")
 
-const msg = generateWAMessageFromContent(m.chat, baileys.proto.Message.fromObject({
-interactiveMessage: {
+const interactiveButtons = [
+{
+name: "cta_copy",
+buttonParamsJson: JSON.stringify({
+display_text: "COPIAR CÓDIGO",
+copy_code: secret
+})
+}
+];
+
+const interactiveMessage = {
+body: { text: rtx2 },
+footer: { text: "🐾 Ruby Hoshino Bot" },
 header: {
 title: "✨ CÓDIGO DE VINCULACIÓN ✨",
 hasMediaAttachment: true,
@@ -163,27 +174,19 @@ imageMessage: {
 url: 'https://qu.ax/ETEVV.jpeg'
 }
 },
-body: {
-text: rtx2
-},
-nativeFlowMessage: {
-buttons: [
-{
-name: 'cta_copy',
-buttonParamsJson: JSON.stringify({
-display_text: `Copiar Código: ${secret}`,
-copy_code: secret
-})
-}
-]
-}
-}
-}), { userJid: m.sender, quoted: m });
+interactiveButtons
+};
 
-codeBot = await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
+const message = {
+message: {
+interactiveMessage
+}
+};
+
+codeBot = await conn.relayMessage(m.chat, message, {});
 
 if (codeBot && codeBot.key) {
-setTimeout(() => { conn.sendMessage(m.sender, { delete: codeBot })}, 45000)
+setTimeout(() => { conn.sendMessage(m.sender, { delete: codeBot.key })}, 45000)
 }
 }
 
