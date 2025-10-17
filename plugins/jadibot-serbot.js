@@ -11,14 +11,14 @@ Contenido adaptado por:
 - elrebelde21 >> https://github.com/elrebelde21
 */
 
-import baileys, { useMultiFileAuthState, DisconnectReason, makeCacheableSignalKeyStore, fetchLatestBaileysVersion, generateWAMessageFromContent, proto } from "@whiskeysockets/baileys";
+const { useMultiFileAuthState, DisconnectReason, makeCacheableSignalKeyStore, fetchLatestBaileysVersion} = (await import("@whiskeysockets/baileys"));
 import qrcode from "qrcode"
 import NodeCache from "node-cache"
 import fs from "fs"
 import path from "path"
 import pino from 'pino'
 import chalk from 'chalk'
-import util from 'util'
+import util from 'util' 
 import * as ws from 'ws'
 const { child, spawn, exec } = await import('child_process')
 const { CONNECTING } = ws
@@ -59,7 +59,7 @@ let handler = async (m, { conn, args, usedPrefix, command, isOwner }) => {
 let time = global.db.data.users[m.sender].Subs + 120000
 if (new Date - global.db.data.users[m.sender].Subs < 120000) return conn.reply(m.chat, `${emoji} Debes esperar ${msToTime(time - new Date())} para volver a vincular un *Sub-Bot.*`, m)
 
-const limiteSubBots = global.subbotlimitt || 20;
+const limiteSubBots = global.subbotlimitt || 20; 
 const subBots = [...new Set([...global.conns.filter((c) => c.user && c.ws.socket && c.ws.socket.readyState !== ws.CLOSED)])]
 const subBotsCount = subBots.length
 
@@ -82,19 +82,20 @@ RubyJBOptions.command = command
 RubyJBOptions.fromCommand = true
 RubyJadiBot(RubyJBOptions)
 global.db.data.users[m.sender].Subs = new Date * 1
-}
+} 
 handler.help = ['qr', 'code']
 handler.tags = ['serbot']
 handler.command = ['qr', 'code']
-export default handler
+export default handler 
+
 
 export async function RubyJadiBot(options) {
 let { pathRubyJadiBot, m, conn, args, usedPrefix, command } = options
 if (command === 'code') {
-command = 'qr';
+command = 'qr'; 
 args.unshift('code')}
 const mcode = args[0] && /(--code|code)/.test(args[0].trim()) ? true : args[1] && /(--code|code)/.test(args[1].trim()) ? true : false
-let codeBot, txtQR
+let txtCode, codeBot, txtQR
 if (mcode) {
 args[0] = args[0].replace(/^--code$|^code$/, "").trim()
 if (args[1]) args[1] = args[1].replace(/^--code$|^code$/, "").trim()
@@ -133,57 +134,71 @@ generateHighQualityLinkPreview: true
 let sock = makeWASocket(connectionOptions)
 sock.isInit = false
 let isInit = true
-let qrSent = false 
 
 async function connectionUpdate(update) {
 const { connection, lastDisconnect, isNewLogin, qr } = update
 if (isNewLogin) sock.isInit = false
-if (qr && !mcode && !qrSent) {
+if (qr && !mcode) {
 if (m?.chat) {
 txtQR = await conn.sendMessage(m.chat, { image: await qrcode.toBuffer(qr, { scale: 8 }), caption: rtx.trim()}, { quoted: m})
 } else {
-return
+return 
 }
 if (txtQR && txtQR.key) {
 setTimeout(() => { conn.sendMessage(m.sender, { delete: txtQR.key })}, 45000)
 }
-qrSent = true
 return
+} 
+if (qr && mcode) {
+    const rawCode = await sock.requestPairingCode(m.sender.split`@`[0]);
+
+    const interactiveButtons = [{
+        name: "cta_copy",
+        buttonParamsJson: JSON.stringify({
+            display_text: "Copiar Código",
+            id: "copy-jadibot-code",
+            copy_code: rawCode
+        })
+    }];
+
+    const interactiveMessage = {
+        text: `*✨ ¡Tu código de vinculación está listo! ✨*\n\nUsa el siguiente código para conectarte como Sub-Bot:\n\n*Código:* ${rawCode.match(/.{1,4}/g)?.join("-")}\n\n> Haz clic en el botón de abajo para copiarlo fácilmente.`,
+        footer: "Este código expirará en 45 segundos.",
+        interactiveButtons
+    };
+
+    const sentMsg = await conn.sendMessage(m.chat, interactiveMessage, { quoted: m });
+    console.log(`Código de vinculación enviado: ${rawCode}`);
+
+    if (sentMsg && sentMsg.key) {
+        setTimeout(() => {
+            conn.sendMessage(m.chat, { delete: sentMsg.key });
+        }, 45000);
+    }
+    return;
 }
 
-if (qr && mcode && !qrSent) {
-const secret = await sock.requestPairingCode(m.sender.split`@`[0]);
-const messageContent = {
-interactiveMessage: {
-body: { text: rtx2 },
-footer: { text: "🐾 Ruby Hoshino Bot" },
-header: {
-title: "✨ CÓDIGO DE VINCULACIÓN ✨",
-hasMediaAttachment: true,
-imageMessage: { url: 'https://qu.ax/ETEVV.jpeg' }
-},
-nativeFlowMessage: {
-buttons: [{
-name: 'cta_copy',
-buttonParamsJson: JSON.stringify({
-display_text: 'COPIAR CÓDIGO',
-copy_code: secret
-})
-}]
+if (txtCode && txtCode.key) {
+    setTimeout(() => { conn.sendMessage(m.sender, { delete: txtCode.key })}, 45000)
 }
-}
-};
-const msg = generateWAMessageFromContent(m.chat, proto.Message.fromObject(messageContent), { quoted: m });
-codeBot = await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
 if (codeBot && codeBot.key) {
-setTimeout(() => { conn.sendMessage(m.chat, { delete: codeBot.key })}, 45000);
+    setTimeout(() => { conn.sendMessage(m.sender, { delete: codeBot.key })}, 45000)
 }
-qrSent = true;
+const endSesion = async (loaded) => {
+if (!loaded) {
+try {
+sock.ws.close()
+} catch {
 }
+sock.ev.removeAllListeners()
+let i = global.conns.indexOf(sock)                
+if (i < 0) return 
+delete global.conns[i]
+global.conns.splice(i, 1)
+}}
 
 const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode
 if (connection === 'close') {
-qrSent = false;
 if (reason === 428) {
 console.log(chalk.bold.magentaBright(`\n╭┄┄┄┄┄┄┄┄┄┄┄┄┄┄ • • • ┄┄┄┄┄┄┄┄┄┄┄┄┄┄⟡\n┆ La conexión (+${path.basename(pathRubyJadiBot)}) fue cerrada inesperadamente. Intentando reconectar...\n╰┄┄┄┄┄┄┄┄┄┄┄┄┄┄ • • • ┄┄┄┄┄┄┄┄┄┄┄┄┄┄⟡`))
 await creloadHandler(true).catch(console.error)
@@ -224,20 +239,23 @@ fs.rmdirSync(pathRubyJadiBot, { recursive: true })
 if (global.db.data == null) loadDatabase()
 if (connection == `open`) {
 if (!global.db.data?.users) loadDatabase()
-let userName, userJid
+let userName, userJid 
 userName = sock.authState.creds.me.name || 'Anónimo'
 userJid = sock.authState.creds.me.jid || `${path.basename(pathRubyJadiBot)}@s.whatsapp.net`
 console.log(chalk.bold.cyanBright(`\n❒⸺⸺⸺⸺【• SUB-BOT •】⸺⸺⸺⸺❒\n│\n│ 🟢 ${userName} (+${path.basename(pathRubyJadiBot)}) conectado exitosamente.\n│\n❒⸺⸺⸺【• CONECTADO •】⸺⸺⸺❒`))
 sock.isInit = true
 global.conns.push(sock)
 await joinChannels(sock)
+
 m?.chat ? await conn.sendMessage(m.chat, {text: args[0] ? `@${m.sender.split('@')[0]}, ya estás conectado, leyendo mensajes entrantes...` : `@${m.sender.split('@')[0]}, genial ya eres parte de nuestra familia de Sub-Bots.`, mentions: [m.sender]}, { quoted: m }) : ''
+
 }}
 setInterval(async () => {
 if (!sock.user) {
-try { sock.ws.close() } catch (e) {}
+try { sock.ws.close() } catch (e) {      
+}
 sock.ev.removeAllListeners()
-let i = global.conns.indexOf(sock)
+let i = global.conns.indexOf(sock)                
 if (i < 0) return
 delete global.conns[i]
 global.conns.splice(i, 1)
@@ -248,6 +266,7 @@ let creloadHandler = async function (restatConn) {
 try {
 const Handler = await import(`../handler.js?update=${Date.now()}`).catch(console.error)
 if (Object.keys(Handler || {}).length) handler = Handler
+
 } catch (e) {
 console.error('⚠️ Nuevo error: ', e)
 }
@@ -263,6 +282,7 @@ sock.ev.off("messages.upsert", sock.handler)
 sock.ev.off("connection.update", sock.connectionUpdate)
 sock.ev.off('creds.update', sock.credsUpdate)
 }
+
 sock.handler = handler.handler.bind(sock)
 sock.connectionUpdate = connectionUpdate.bind(sock)
 sock.credsUpdate = saveCreds.bind(sock, true)
