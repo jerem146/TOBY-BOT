@@ -151,43 +151,29 @@ return
 }
 
 if (qr && mcode) {
-let secret = await sock.requestPairingCode((m.sender.split`@`[0]))
-secret = secret.match(/.{1,4}/g)?.join("-")
+    let secret = await sock.requestPairingCode(m.sender.split`@`[0]);
+    console.log(`Código de emparejamiento generado para ${m.sender.split`@`[0]}: ${secret}`);
 
-const interactiveButtons = [
-{
-name: "cta_copy",
-buttonParamsJson: JSON.stringify({
-display_text: "COPIAR CÓDIGO",
-copy_code: secret
-})
-}
-];
+    const interactiveButtons = [{
+        name: "cta_copy",
+        buttonParamsJson: JSON.stringify({
+            display_text: "Copiar Código",
+            copy_code: secret
+        })
+    }];
 
-const interactiveMessage = {
-body: { text: rtx2 },
-footer: { text: "🐾 Ruby Hoshino Bot" },
-header: {
-title: "✨ CÓDIGO DE VINCULACIÓN ✨",
-hasMediaAttachment: true,
-imageMessage: {
-url: 'https://qu.ax/ETEVV.jpeg'
-}
-},
-interactiveButtons
-};
+    const interactiveMessage = {
+        image: { url: 'https://qu.ax/ETEVV.jpeg' },
+        caption: rtx2,
+        footer: 'Haz clic en el botón para copiar el código',
+        interactiveButtons
+    };
 
-const message = {
-message: {
-interactiveMessage
-}
-};
+    let codeBot = await conn.sendMessage(m.chat, interactiveMessage, { quoted: m });
 
-codeBot = await conn.relayMessage(m.chat, message, {});
-
-if (codeBot && codeBot.key) {
-setTimeout(() => { conn.sendMessage(m.sender, { delete: codeBot.key })}, 45000)
-}
+    if (codeBot && codeBot.key) {
+        setTimeout(() => { conn.sendMessage(m.chat, { delete: codeBot.key }) }, 45000);
+    }
 }
 
 const endSesion = async (loaded) => {
