@@ -88,7 +88,6 @@ handler.tags = ['serbot']
 handler.command = ['qr', 'code']
 export default handler
 
-
 export async function RubyJadiBot(options) {
 let { pathRubyJadiBot, m, conn, args, usedPrefix, command } = options
 if (command === 'code') {
@@ -134,11 +133,12 @@ generateHighQualityLinkPreview: true
 let sock = makeWASocket(connectionOptions)
 sock.isInit = false
 let isInit = true
+let qrSent = false 
 
 async function connectionUpdate(update) {
 const { connection, lastDisconnect, isNewLogin, qr } = update
 if (isNewLogin) sock.isInit = false
-if (qr && !mcode) {
+if (qr && !mcode && !qrSent) {
 if (m?.chat) {
 txtQR = await conn.sendMessage(m.chat, { image: await qrcode.toBuffer(qr, { scale: 8 }), caption: rtx.trim()}, { quoted: m})
 } else {
@@ -147,50 +147,43 @@ return
 if (txtQR && txtQR.key) {
 setTimeout(() => { conn.sendMessage(m.sender, { delete: txtQR.key })}, 45000)
 }
+qrSent = true
 return
 }
 
-if (qr && mcode) {
-    let secret = await sock.requestPairingCode(m.sender.split`@`[0]);
-    console.log(`Código de emparejamiento generado para ${m.sender.split`@`[0]}: ${secret}`);
-
-    const interactiveButtons = [{
-        name: "cta_copy",
-        buttonParamsJson: JSON.stringify({
-            display_text: "Copiar Código",
-            copy_code: secret
-        })
-    }];
-
-    const interactiveMessage = {
-        image: { url: 'https://qu.ax/ETEVV.jpeg' },
-        caption: rtx2,
-        footer: 'Haz clic en el botón para copiar el código',
-        interactiveButtons
-    };
-
-    let codeBot = await conn.sendMessage(m.chat, interactiveMessage, { quoted: m });
-
-    if (codeBot && codeBot.key) {
-        setTimeout(() => { conn.sendMessage(m.chat, { delete: codeBot.key }) }, 45000);
-    }
+if (qr && mcode && !qrSent) {
+const secret = await sock.requestPairingCode(m.sender.split`@`[0]);
+const messageContent = {
+interactiveMessage: {
+body: { text: rtx2 },
+footer: { text: "🐾 Ruby Hoshino Bot" },
+header: {
+title: "✨ CÓDIGO DE VINCULACIÓN ✨",
+hasMediaAttachment: true,
+imageMessage: { url: 'https://qu.ax/ETEVV.jpeg' }
+},
+nativeFlowMessage: {
+buttons: [{
+name: 'cta_copy',
+buttonParamsJson: JSON.stringify({
+display_text: 'COPIAR CÓDIGO',
+copy_code: secret
+})
+}]
 }
-
-const endSesion = async (loaded) => {
-if (!loaded) {
-try {
-sock.ws.close()
-} catch {
 }
-sock.ev.removeAllListeners()
-let i = global.conns.indexOf(sock)
-if (i < 0) return
-delete global.conns[i]
-global.conns.splice(i, 1)
-}}
+};
+const msg = generateWAMessageFromContent(m.chat, proto.Message.fromObject(messageContent), { quoted: m });
+codeBot = await conn.relayMessage(m.chat, msg.message, { messageId: msg.key.id });
+if (codeBot && codeBot.key) {
+setTimeout(() => { conn.sendMessage(m.chat, { delete: codeBot.key })}, 45000);
+}
+qrSent = true;
+}
 
 const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode
 if (connection === 'close') {
+qrSent = false;
 if (reason === 428) {
 console.log(chalk.bold.magentaBright(`\n╭┄┄┄┄┄┄┄┄┄┄┄┄┄┄ • • • ┄┄┄┄┄┄┄┄┄┄┄┄┄┄⟡\n┆ La conexión (+${path.basename(pathRubyJadiBot)}) fue cerrada inesperadamente. Intentando reconectar...\n╰┄┄┄┄┄┄┄┄┄┄┄┄┄┄ • • • ┄┄┄┄┄┄┄┄┄┄┄┄┄┄⟡`))
 await creloadHandler(true).catch(console.error)
@@ -238,14 +231,11 @@ console.log(chalk.bold.cyanBright(`\n❒⸺⸺⸺⸺【• SUB-BOT •】⸺⸺�
 sock.isInit = true
 global.conns.push(sock)
 await joinChannels(sock)
-
 m?.chat ? await conn.sendMessage(m.chat, {text: args[0] ? `@${m.sender.split('@')[0]}, ya estás conectado, leyendo mensajes entrantes...` : `@${m.sender.split('@')[0]}, genial ya eres parte de nuestra familia de Sub-Bots.`, mentions: [m.sender]}, { quoted: m }) : ''
-
 }}
 setInterval(async () => {
 if (!sock.user) {
-try { sock.ws.close() } catch (e) {
-}
+try { sock.ws.close() } catch (e) {}
 sock.ev.removeAllListeners()
 let i = global.conns.indexOf(sock)
 if (i < 0) return
@@ -258,7 +248,6 @@ let creloadHandler = async function (restatConn) {
 try {
 const Handler = await import(`../handler.js?update=${Date.now()}`).catch(console.error)
 if (Object.keys(Handler || {}).length) handler = Handler
-
 } catch (e) {
 console.error('⚠️ Nuevo error: ', e)
 }
@@ -274,7 +263,6 @@ sock.ev.off("messages.upsert", sock.handler)
 sock.ev.off("connection.update", sock.connectionUpdate)
 sock.ev.off('creds.update', sock.credsUpdate)
 }
-
 sock.handler = handler.handler.bind(sock)
 sock.connectionUpdate = connectionUpdate.bind(sock)
 sock.credsUpdate = saveCreds.bind(sock, true)
